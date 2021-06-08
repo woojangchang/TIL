@@ -10,5 +10,5 @@ Numpy
 
 [OpenCV](OpenCV)
 
-[Statistics (Python)](Python-Statistics)
+[Statistics (Python)](Python Statistics)
 
