@@ -1,5 +1,17 @@
 210610
 
+- [Preprocessing](#preprocessing)
+  * [NaN](#nan)
+    + [Imputer](#imputer)
+  * [RFE](#rfe)
+  * [PCA](#pca)
+    + [PCA와 RFE](#pca--rfe)
+  * [Normalization](#normalization)
+  * [Standardization](#standardization)
+    + [Example](#example)
+- [Scikit Learn](#scikit-learn)
+  * [Fit & Transform](#fit---transform)
+
 # Preprocessing
 
 ## NaN
