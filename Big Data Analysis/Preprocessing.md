@@ -555,8 +555,13 @@ print(X_selected.shape)
 > (중략)
 >
 > **각각의 독립변수를 하나만 사용한 예측모형의 성능을 이용하여 가장 분류성능 혹은 상관관계가 높은 변수만 선택하는 방법이다.**
+<<<<<<< HEAD
 >
 > > [데이터 사이언스 스쿨 - 특징 선택](https://datascienceschool.net/03%20machine%20learning/14.03%20%ED%8A%B9%EC%A7%95%20%EC%84%A0%ED%83%9D.html)
+=======
+
+출처 : [데이터 사이언스 스쿨 - 특징 선택](#https://datascienceschool.net/03%20machine%20learning/14.03%20%ED%8A%B9%EC%A7%95%20%EC%84%A0%ED%83%9D.html)
+>>>>>>> 9a3b9983da909b786efe4bfd5016385dbf6f8d5a
 
 # Scikit Learn
 
