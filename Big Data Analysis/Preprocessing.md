@@ -12,7 +12,17 @@
 - [Scikit Learn](#scikit-learn)
   * [Fit & Transform](#fit---transform)
 
+
+
+- 분석방법론에 따라 데이터 분석을 진행했다는 것을 명시해야한다. (KDD, CRISP-DM 등)
+
 # Preprocessing
+
+- 전처리된 데이터를 가져와 쓴다면 어떤 pre-trained data를 쓰는지 명시를 해야한다.
+  - 전처리 데이터마다 다른 bias를 가지고 있기 때문
+  - bias 원인으로는 원래의 데이터로부터 새롭게 만들어진 파생변수가 있다.
+
+
 
 ## NaN
 
@@ -20,13 +30,13 @@
 dataframe = read_csv(url, header=None, na_values='?')
 ```
 
-- `na_values='?'` : 원래 데이터 파일의 ?를 NaN으로 가져온다.
+- `na_values='?'` : 원래 데이터 파일의 ?를 `NaN`으로 가져온다.
 
 ```python
 dataframe.isnull().sum() # 각 열의 결측치 개수 확인
 ```
 
-- `.isnull()` : 데이터 프레임의 결측치(NaN)를 True/False로 반환
+- `.isnull()` : 데이터 프레임의 결측치(`NaN`)를 `True`/`False`로 반환
 - `.sum()` : 각 행의 값을 모두 합친다.
   - 디폴트 값은 `axis='rows'`이며 열의 값을 합치려면 `axis='columns'`를 넣어주면 된다.
 
@@ -58,6 +68,8 @@ Xtrans = imputer.transform(X) # 위에서 만들어낸 fit을 X의 NaN에 대입
   - 자세한 내용은 아래 [Scikit Learn](#scikit-learn)에서 확인
 
 
+
+변수간의 상관관계를 확인하는 메서드
 
 ![image-20210610143841768](Preprocessing.assets/image-20210610143841768.png)
 
@@ -280,7 +292,266 @@ PAY_AMT6, Rank: 1
 
 
 
+## Categorization
 
+### KBinsDiscretizer
+
+```python
+# discretize numeric input variables
+from sklearn.datasets import make_classification
+from sklearn.preprocessing import KBinsDiscretizer
+```
+
+```python
+# define dataset
+X, y = make_classification(n_samples=1000, n_features=5, n_informative=5, n_redundant=0,
+random_state=1)
+
+# summarize data before the transform
+X.max(), X.min()
+
+# (5.994383947517616, -6.0167462574529615)
+```
+
+```python
+# define the transform
+trans = KBinsDiscretizer(n_bins=10, encode='ordinal', strategy='uniform')
+```
+
+- `n_bins` : 분류할 개수 (범주의 수)
+
+- `encode` : 인코드 방법 설정
+
+  - `ordinal` : 눈으로 보기에는 쉽지만 대소관계로 판단하여 잘못된 모델링을 만들 수 있다. (실수형에 사용은 OK)
+
+  | RED   | >>   | 2    |
+  | ----- | ---- | ---- |
+  | GREEN | >>   | 1    |
+  | BLUE  | >>   | 0    |
+
+  - `onehot` : 카테고리 수가 증가할수록 메모리 소모가 크다.
+
+  | RED   | >>   | 0    | 0    | 1    |
+  | ----- | ---- | ---- | ---- | ---- |
+  | GREEN | >>   | 0    | 1    | 0    |
+  | BLUE  | >>   | 1    | 0    | 0    |
+
+- `stragegy` : 범주의 간격 설정
+
+  - `uniform` : 모든 범주가 같은 간격을 갖는다.
+  - `quantile` : 모든 범주가 같은 퍼센티지를 갖는다.
+
+```python
+# transform the data
+X_discrete = trans.fit_transform(X)
+
+X_discrete.max(), X_discrete.min()
+
+# (9.0, 0.0)
+```
+
+- 주의점 : 각 열마다 max, min이 다르기 때문에 같은 값이라도 다른 범주로 정해질 수 있다.
+
+### Ordinal Encoder
+
+- 개수만큼 0, 1, ... 로 표현
+
+```python
+# https://machinelearningmastery.com/one-hot-encoding-for-categorical-data/
+
+from numpy import asarray
+from sklearn.preprocessing import OrdinalEncoder
+from sklearn.preprocessing import OneHotEncoder
+
+# define data
+data = asarray([['red'], ['green'], ['blue']])
+print(data)
+# define ordinal encoding
+encoder = OrdinalEncoder()
+# transform data
+result = encoder.fit_transform(data)
+print(result)
+'''
+[['red']
+ ['green']
+ ['blue']]
+[[2.]
+ [1.]
+ [0.]]
+'''
+```
+
+
+
+### OneHot Encoder
+
+- 바이너리로 표현
+
+```python
+# one-hot-encode.ipynb
+
+from pandas import read_csv
+from sklearn.preprocessing import OneHotEncoder
+# define the location of the dataset
+url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/breast-cancer.csv"
+# load the dataset
+dataset = read_csv(url, header=None)
+dataset.head()
+```
+
+```python
+dataset[0].unique()
+# array(["'40-49'", "'50-59'", "'60-69'", "'30-39'", "'70-79'", "'20-29'"], dtype=object)
+```
+
+```python
+# separate into input and output columns
+X = data[:, :-1].astype(str)
+y = data[:, -1].astype(str)
+```
+
+#### `sparse=False`
+
+: 출력 결과를 압축하지 않고 날것 그대로 보여준다.
+
+```python
+# define the one hot encoding transform
+encoder = OneHotEncoder(sparse=False)
+# fit and apply the transform to the input data
+X_oe = encoder.fit_transform(X)
+# summarize tratransformed data
+print(X_oe[:1, :])
+'''
+[[0. 0. 1. 0. 0. 0. 0. 0. 1. 0. 0. 1. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 0. 0.
+  0. 0. 0. 0. 1. 0. 0. 0. 1. 0. 1. 0. 0. 1. 0. 0. 0. 1. 0.]]
+'''
+```
+
+#### `sparse=True`
+
+: 출력 결과를 압축하여 메모리 공간에 여유를 준다.
+
+```python
+encoder = OneHotEncoder() # OneHotEncoder(sparse=True)
+# fit and apply the transform to the input data
+X_oe = encoder.fit_transform(X)
+# summarize tratransformed data
+print(X_oe[:1, :])
+'''
+  (0, 2)	1.0
+  (0, 8)	1.0
+  (0, 11)	1.0
+  (0, 20)	1.0
+  (0, 28)	1.0
+  (0, 32)	1.0
+  (0, 34)	1.0
+  (0, 37)	1.0
+  (0, 41)	1.0
+'''
+```
+
+위 출력 결과 (p, k)는 p번째 관측값의 k번째 인덱스가 1이라는 것을 표시하는 것이다.
+
+
+
+### LabelEncoder
+
+- 기능적으로 Ordinal Encoder와 같으나 1D array만 가능하다.
+
+```python
+import pandas as pd
+fruit = pd.DataFrame({'name':['apple', 'banana', 'cherry', 'durian'],
+                      'color':['red', 'yellow', 'red', 'green']})   
+fruit
+```
+
+|      | name   | color  |
+| ---- | ------ | ------ |
+| 0    | apple  | red    |
+| 1    | banana | yellow |
+| 2    | cherry | red    |
+| 3    | durian | green  |
+
+```python
+from sklearn.preprocessing import LabelEncoder
+
+le = LabelEncoder()
+le.fit(fruit['name'])
+fruit['name'] = le.transform(fruit['name'])
+fruit
+```
+
+|      | name | color  |
+| ---- | ---- | ------ |
+| 0    | 0    | red    |
+| 1    | 1    | yellow |
+| 2    | 2    | red    |
+| 3    | 3    | green  |
+
+```python
+fruit['color'] = le.fit_transform(fruit['color'])
+fruit
+```
+
+|      | name | color |
+| ---- | ---- | ----- |
+| 0    | 0    | 1     |
+| 1    | 1    | 2     |
+| 2    | 2    | 1     |
+| 3    | 3    | 0     |
+
+
+
+#### Compare with Ordinal Encoder
+
+```python
+fruit = pd.DataFrame({'name':['apple', 'banana', 'cherry', 'durian'],
+                      'color':['red', 'yellow', 'red', 'green']}) 
+encoder = OrdinalEncoder()
+onehot = encoder.fit_transform(fruit)
+onehot
+'''
+array([[0., 1.],
+       [1., 2.],
+       [2., 1.],
+       [3., 0.]])
+'''
+```
+
+
+
+## Classification
+
+```python
+# ANOVA feature selection for numeric input and categorical output
+from sklearn.datasets import make_classification
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import f_classif
+# generate dataset
+X, y = make_classification(n_samples=100, n_features=20, n_informative=2)
+# define feature selection
+fs = SelectKBest(score_func=f_classif, k=2)
+# apply feature selection
+X_selected = fs.fit_transform(X, y)
+print(X_selected.shape)
+```
+
+- `score_func` : `f_classif`, `chi2`, `mutual_info_classif`
+- `f_classif` : 분산분석(ANOVA) F검정 통계량
+  - input이 범주형, output이 연속형 변수이며 셋 이상일 때 사용
+- `chi2` : 카이제곱 검정 통계량
+  - input, ouput 모두 범주형 변수일 때 사용
+- 사용하는 의의
+
+> 상관관계 계산에 앞서 특징데이터의 값 자체가 표본에 따라 그다지 변하지 않는다면 종속데이터 예측에도 도움이 되지 않을 가능성이 높다. 따라서 **표본 변화에 따른 데이터 값의 변화 즉, 분산이 기준치보다 낮은 특징 데이터는 사용하지 않는 방법**이 분산에 의한 선택 방법이다.
+>
+> (중략)
+>
+> **각각의 독립변수를 하나만 사용한 예측모형의 성능을 이용하여 가장 분류성능 혹은 상관관계가 높은 변수만 선택하는 방법이다.**
+>
+> > [데이터 사이언스 스쿨 - 특징 선택]: https://datascienceschool.net/03%20machine%20learning/14.03%20%ED%8A%B9%EC%A7%95%20%EC%84%A0%ED%83%9D.html	"test"
+> >
+> > 
 
 # Scikit Learn
 
@@ -301,3 +572,4 @@ fit_transform(data)
 2번 코드를 사용하면 fit, transform을 한줄로 편하게 쓸 수 있으나 테스트 데이터에는 사용하면 안 되므로 1번 코드를 사용하거나, 훈련데이터와 테스트 데이터를 나누기 이전에 fit_transform을 해준다.
 
 https://www.inflearn.com/questions/19038
+
