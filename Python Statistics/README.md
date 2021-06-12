@@ -38,3 +38,49 @@
 ## 확률 모형
 
 - 확률 분포
+
+
+
+# Chapter 5
+
+## 1차원 이산형 확률변수
+
+- 기댓값, 분산
+
+## 2차원 이산형 확률변수
+
+- 결합확률분포, 주변확률분포
+- 기댓값, 분산, 공분산, 상관계수
+
+
+
+# Chapter 6
+
+## 베르누이 분포
+
+$$
+f(x) = \begin{cases}p^x(1-p)^{(1-x)} & (x\in\{0,1\}) \\ 0 & (otherwise) \end{cases} \\
+X\sim Bern(p) 일\ 때 \ E(X) =p, \ V(X)=p(1-p)
+$$
+
+## 이항분포
+
+$$
+f(x) = \begin{cases}_nC_xp^x(1-p)^{(n-x)} & (x\in\{0,1,...,n\}) \\ 0 & (otherwise) \end{cases} \\
+X\sim Bin(n,p) 일\ 때 \ E(X)=np, \ V(X) = np(1-p)
+$$
+
+## 기하분포
+
+$$
+f(x) = \begin{cases} (1-p)^{(x-1)}p & (x\in \{1,2,3,...\}) \\ 0 & (otherwise) \end{cases} \\
+X\sim Ge(p)일\ 때 \ E(X) = {{1} \over {p}}, V(X) = {{(1-p)} \over {p^2}}
+$$
+
+## 포아송 분포
+
+$$
+f(x) = \begin{cases}{ {\lambda ^x} \over {x!} } e^{-\lambda } & (x\in \{0, 1, 2, ...\}) \\ 0 & (otherwise) \end{cases} \\
+X \sim Poi(\lambda) 일\ 때 \ E(X)=\lambda, \ V(X) = \lambda
+$$
+
