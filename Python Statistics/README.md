@@ -84,3 +84,17 @@ f(x) = \begin{cases}{ {\lambda ^x} \over {x!} } e^{-\lambda } & (x\in \{0, 1, 2,
 X \sim Poi(\lambda) 일\ 때 \ E(X)=\lambda, \ V(X) = \lambda
 $$
 
+
+
+# Chapter 7
+
+## 1차원 확률 변수
+
+- 확률밀도함수, 누적분포함수
+- 기댓값, 분산
+
+## 2차원 확률 변수
+
+- 결합확률밀도함수, 주변확률밀도함수
+- 기댓값, 분산, 공분산, 상관계수
+
