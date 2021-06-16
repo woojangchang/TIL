@@ -16,6 +16,8 @@ Numpy
 
 [Database (MySQL)](SQL)
 
+[데이터 시각화](Visualization)
+
 
 
 목표
