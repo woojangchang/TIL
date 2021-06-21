@@ -12,6 +12,8 @@ Numpy
 
 [Statistics (Python)](Python%20Statistics)
 
+[Web (HTML, CSS, JavaScript)](Web)
+
 [Big Data Analysis](Big%20Data%20Analysis)
 
 [Database (MySQL)](SQL)
@@ -22,5 +24,5 @@ Numpy
 
 목표
 
-파이썬 통계분석(~6.20), SQL 데이터 전처리 분석 → Django → 크롤러, 스크레이핑
+파이썬 통계분석(~6.20) → SQL 데이터 전처리 분석 → Django → 크롤러, 스크레이핑
 
