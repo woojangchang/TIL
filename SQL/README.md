@@ -91,3 +91,12 @@ https://pandas.pydata.org/pandas-docs/stable/getting_started/comparison/comparis
 - MECE (Mutually Exclusive Collectively Exhaustive) : 각 항목들이 상호 배타적이면서 모으면 완전하게 합쳐지는 것
 - 항상 정합성을 확인하는 습관을 들여야한다.
 
+
+
+# Chapter 4. 자동차 매출 데이터를 이용한 리포트 작성
+
+- `SUBSTR(칼럼, 위치, 길이)` : 문자열에서 원하는 부분만 가져오기
+  - `select substr('abcde', 2, 3)` : bcd 출력
+- `DISTINCT` : 중복값을 제외
+  - `COUNT(DISTINCT column_name)` : 중복값을 제외한 개수 세기
+
