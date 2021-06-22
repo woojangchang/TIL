@@ -81,3 +81,13 @@ https://pandas.pydata.org/pandas-docs/stable/getting_started/comparison/comparis
 - `RANK`, `DENSE_RANK`, `ROW_NUMBER`
 - `SUBQUERY`
 
+
+
+# Chapter 3. 데이터 추가, 삭제, 갱신, 데이터 정합성
+
+- `INSERT`, `DELETE`, `UPDATE`, `PROCEDURE`, `VIEW`
+- 데이터 정합성 : 데이터들의 값이 일치함
+  - 예) 전체 매출 = 각 연도별 매출의 합
+- MECE (Mutually Exclusive Collectively Exhaustive) : 각 항목들이 상호 배타적이면서 모으면 완전하게 합쳐지는 것
+- 항상 정합성을 확인하는 습관을 들여야한다.
+
