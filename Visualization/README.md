@@ -106,3 +106,11 @@ sns.scatterplot(data=tips, x='total_bill', y='tip',
 
 ![image-20210616155301143](README.assets/image-20210616155301143.png)
 
+
+
+# plotly
+
+- 지도 그리기
+
+예제 : https://www.kaggle.com/erikbruin/covid-19-the-story-of-the-vaccines/#data
+
