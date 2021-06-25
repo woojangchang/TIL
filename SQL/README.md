@@ -95,8 +95,29 @@ https://pandas.pydata.org/pandas-docs/stable/getting_started/comparison/comparis
 
 # Chapter 4. 자동차 매출 데이터를 이용한 리포트 작성
 
+- `left join ~ on`을 연습하기 좋은 예제
 - `SUBSTR(칼럼, 위치, 길이)` : 문자열에서 원하는 부분만 가져오기
   - `select substr('abcde', 2, 3)` : bcd 출력
 - `DISTINCT` : 중복값을 제외
   - `COUNT(DISTINCT column_name)` : 중복값을 제외한 개수 세기
+- `CREATE TABLE DATA.NAME AS ` : `DATA`에 `NAME`이라는 명을 가진 표 생성 (이후에 `SELECT`문을 사용하여 테이블 생성)
+- `SELECT`로 생성한 필드는 조건절 `WHERE`에서 사용할 수 없기 때문에 `SUBQUERY`를 이용한다.
+
+```mysql
+select *
+from
+(select country, sales, dense_rank() over(order by sales desc) RNK
+from
+(select c.country, sum(priceeach*quantityordered) as sales
+from orders a
+left join orderdetails b
+on a.ordernumber = b.ordernumber
+left join customers c
+on a.customernumber = c.customernumber
+group by 1) a) a
+where rnk <= 5;
+```
+
+- subquery `from ()` 이후 필드 명을 지정해줘야 한다. (위처럼 a)
+- `DATEDIFF( date1, date2 )` : date1 - date2를 반환
 
