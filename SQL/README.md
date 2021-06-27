@@ -75,10 +75,10 @@ https://pandas.pydata.org/pandas-docs/stable/getting_started/comparison/comparis
 - `SELECT`, `DISTINCT`
 - `USE`, `FROM`
 - `WHERE`, `BETWEEN`, `IN`, `IS NULL`
-
 - `GROUP BY`, `SUM`, `AVG`, `COUNT`, `CASE WHEN ... END`
 - `LEFT JOIN`, `ON`, `INNER JOIN`, `FULL JOIN`
-- `RANK`, `DENSE_RANK`, `ROW_NUMBER`
+- `RANK`, `DENSE_RANK`, `ROW_NUMBER` + `OVER`
+  - `PARTITION BY`
 - `SUBQUERY`
 
 
@@ -120,4 +120,38 @@ where rnk <= 5;
 
 - subquery `from ()` 이후 필드 명을 지정해줘야 한다. (위처럼 a)
 - `DATEDIFF( date1, date2 )` : date1 - date2를 반환
+
+
+
+# Chapter 5. 상품 리뷰 데이터를 이용한 리포트 작성
+
+- `FLOOR` : 소수점 첫째자리에서 내림
+- `LIMIT 10` : 출력 결과를 10줄만 보여주기
+
+```mysql
+use mydata;
+
+select `review text`,
+case when `review text` like '%size%' then 1 else 0 end size_yn
+from dataset2;
+```
+
+- `review text` column의 각 value에 `size`라는 단어가 포함되는지 확인
+  - `%size%` : size라는 단어의 앞뒤로 글자가 있어도 추출
+
+```mysql
+select floor(age/10)*10 ageband,
+`department name`,
+sum(case when `review text` like '%size%' then 1 else 0 end) / sum(1) n_size,
+sum(case when `review text` like '%large%' then 1 else 0 end) / sum(1) n_large,
+sum(case when `review text` like '%loose%' then 1 else 0 end) / sum(1) n_loose,
+sum(case when `review text` like '%small%' then 1 else 0 end) / sum(1) n_small,
+sum(case when `review text` like '%tight%' then 1 else 0 end) / sum(1) n_tight
+from dataset2
+group by 1, 2
+order by 1, 2;
+```
+
+- `sum(1)`과 `count(*)`은 같은 결과를 출력한다.
+  - `sum(1)`은 row마다 1이라는 수를 생성하고 이를 모두 합한 결과를 의미
 
