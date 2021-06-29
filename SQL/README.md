@@ -162,3 +162,7 @@ order by 1, 2;
   - `HAVING` : 그룹핑한 데이터에 조건을 생성
 - `VARIANCE` : 분산 계산
 
+# Chapter 7. UK Commerce 데이터를 이용한 리포트 작성
+
+- `TIMESTAMPDIFF(MONTH/DAY, START, END)` : 월/일 간격
+

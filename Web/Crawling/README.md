@@ -31,7 +31,7 @@ print(soup.prettify())
 PDF 파일로부터 표 추출하기
 
 - `pip install camelot-py==0.9.0`
-- ``pip install PyMuPDF==1.18.14`
+- `pip install PyMuPDF==1.18.14`
 - https://www.ghostscript.com/download/gsdnld.html
 
 ```python
