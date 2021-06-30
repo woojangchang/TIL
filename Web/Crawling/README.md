@@ -48,3 +48,33 @@ tables[0].df
 tables[0].to_excel('table0.xlsx')
 ```
 
+# Unix
+
+- https://replit.com
+  - Bash(Linux 환경)를 웹에서 사용 가능
+
+- `!!` : 전에 실행했던 cmd를 실행
+- `^a^b` : 전에 실행했던 cmd에서 a를 b로 대체
+- `grep <패턴> <파일이름>` : 패턴에 맞는 폴더/파일 목록 출력
+
+```bash
+# 예시
+# 디렉토리 내 폴더/파일 목록 출력
+ls -l
+
+# 디렉토리 내 wiki라는 단어가 포함된 폴더/파일 목록 출력
+!! | grep wiki
+
+# 디렉토리 내 python 단어가 포함된 폴더/파일 목록 출력
+^wiki^python
+```
+
+- `sed <옵션> <명령어> <파일 이름>` : 문자열의 특정 내용을 변경하거나 줄단위 데이터를 추출할 때
+  - 명령어 `s/a/b/` : a 표현을 b로 바꾼다.
+  - 파일 이름 `file1 > file2` : file1을 수정하여 file2로 저장한다. (`> file2`를 쓰지 않으면 단순 출력)
+
+# Log
+
+- `pip install logging`
+- `pip install colorlog`
+
