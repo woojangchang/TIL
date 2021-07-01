@@ -12,7 +12,7 @@ Numpy
 
 [Database (MySQL)](SQL)
 
-[Web (HTML, CSS, JavaScript)](Web)
+[Web (Crawling, Regular Expression)](Web)
 
 [Django](Django)
 
