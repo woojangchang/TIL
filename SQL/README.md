@@ -42,20 +42,22 @@ finally:
 ```python
 import pandas as pd
 
+import pymysql.cursors
+
 conn = pymysql.connect(host='localhost', user='root', 
                        password='password', db='dbname', charset='utf8',
                        autocommit=True, cursorclass=pymysql.cursors.DictCursor)
 try:
-   with conn.cursor() as curs:
-      sql = "sql code;"
-      curs.execute(sql)
-      rs = curs.fetchall()
+    with conn.cursor() as curs:
+        sql = "sql code;"
+        curs.execute(sql)
+        rs = curs.fetchall()
 
       # DB에서 받아온 값을 DataFrame에 넣음
-      df = pd.DataFrame(rs)
-      print(df)
+        df = pd.DataFrame(rs)
+        print(df)
 finally:
-   conn.close()
+    conn.close()
 ```
 
 - `curs.fetchone()` : 커서가 있는 위치의 값만을 반환
@@ -166,4 +168,6 @@ order by 1, 2;
 
 - `TIMESTAMPDIFF(MONTH/DAY, START, END)` : 월/일 간격
 - `WEEKOFYEAR(DATE)` : 날짜를 해당 년도의 주차로 반환
+
+# Chapter 8. 타이타닉 호 데이터 분석
 
