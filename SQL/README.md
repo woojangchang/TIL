@@ -165,4 +165,5 @@ order by 1, 2;
 # Chapter 7. UK Commerce 데이터를 이용한 리포트 작성
 
 - `TIMESTAMPDIFF(MONTH/DAY, START, END)` : 월/일 간격
+- `WEEKOFYEAR(DATE)` : 날짜를 해당 년도의 주차로 반환
 
