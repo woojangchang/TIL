@@ -12,9 +12,9 @@ Numpy
 
 [Database (MySQL)](SQL)
 
-[Web (Crawling, Regular Expression)](Web)
-
 [Django](Django)
+
+[Web (Crawling, Regular Expression)](Web)
 
 [데이터 시각화](Visualization)
 
@@ -22,7 +22,7 @@ Numpy
 
 [Big Data Analysis](Big%20Data%20Analysis)
 
-
+[애자일 프로젝트](Agile%20Project)
 
 
 
@@ -30,5 +30,5 @@ Numpy
 
 ## 목표
 
-파이썬 통계분석(~6.20) → SQL 데이터 전처리 분석 → Django → 크롤러, 스크레이핑
+파이썬 통계분석(~21.06.20) → SQL 데이터 전처리 분석(~21.07.01) → Django → 크롤러, 스크레이핑
 
