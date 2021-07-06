@@ -22,7 +22,7 @@
 Prompt(cmd)에서
 
 - `django-admin startproject ToDoList`
-  - `ToDoList : 본인이 만들 프로젝트명을 입력
+  - `ToDoList` : 본인이 만들 프로젝트명을 입력
 
 ### 1.2 Configure Application
 
