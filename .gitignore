@@ -1,6 +1,8 @@
 
 # Created by https://www.toptal.com/developers/gitignore/api/windows,macos,python,pycharm,django,jupyternotebooks
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,python,pycharm,django,jupyternotebooks
+### Custom ###
+secrets.json
 
 ### Django ###
 *.log

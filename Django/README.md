@@ -4,6 +4,48 @@
 
 [Chapter 2_ToDoList 만들기](Chapter%202)
 
+# Secret Key 가리기
+
+https://inma.tistory.com/83
+
+- `project/project/settings.py`
+
+```python
+# project/project/settings.py
+import os
+import json
+from django.core.exceptions import ImproperlyConfigured
+
+secret_file = os.path.join(BASE_DIR, 'secrets.json')
+with open(secret_file) as f:
+    secrets = json.loads(f.read())
+
+def get_secret(setting, secrets=secrets):
+    try:
+        print('check :', secrets[setting])
+        return secrets[setting]
+    except KeyError:
+        error_msg = 'Set the {} environment variable'.format(setting)
+        raise ImproperlyConfigured(error_msg)
+SECRET_KEY = get_secret("SECRET_KEY")
+```
+
+- `project/secrets.json`
+
+```json
+{
+    "SECRET_KEY":"secret key"
+}
+```
+
+- `.gitignore`
+
+```notepad
+secrets.json
+```
+
+
+
 # Django
 
 ## Chapter 1

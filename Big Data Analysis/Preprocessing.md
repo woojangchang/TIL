@@ -54,9 +54,9 @@ dataframe.isnull().sum() # 각 열의 결측치 개수 확인
 ```python
 from sklearn.impute import SimpleImputer
 
-imputer = SimpleImputer(stratege='mean')
-# imputer = SimpleImputer(stratege='median')
-# imputer = SimpleImputer(stratege='most_frequent')
+imputer = SimpleImputer(strategy='mean')
+# imputer = SimpleImputer(strategy='median')
+# imputer = SimpleImputer(strategy='most_frequent')
 ```
 
 ```python

@@ -32,3 +32,17 @@ Numpy
 
 파이썬 통계분석(~21.06.20) → SQL 데이터 전처리 분석(~21.07.01) → Django → 크롤러, 스크레이핑
 
+
+
+## 자주 쓰는 것
+
+### 아나콘다 가상환경 설정(jupyter lab)
+
+1. `conda create --name <name>`
+2. `conda activate <name>`
+3. `pip install ipykernel`
+4. `python -m ipykernel install --user --name <name> --display-name "Python <name>"`
+5. `conda install -c conda-forge jupyterlab`
+
+- 삭제 : `conda remove --name <name> --all`
+
