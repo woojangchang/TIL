@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            .box {
+                border:2px solid black;
+                padding: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class='box'>
+            <h1>My First JavaScript</h1>
+
+            <button type="button"
+            onclick="document.getElementById('demo').innerHTML = Date()">
+            Click me to display Date and Time.</button>
+    
+            <p id="demo">Hello.</p>
+        </div>
+        <div class='box'>
+            <h1>My Second JavaScript</h1>
+
+            <button type="button"
+            onclick="document.getElementById('style').style.color='red';
+            document.getElementById('style').innerHTML = '<b>Red Text</b>'">
+            Click me to change text color blue to red.</button>
+
+            <p id='style' style='color:blue'>Blue Text</p>
+        </div>
+        
+    </body>
+</html> 
