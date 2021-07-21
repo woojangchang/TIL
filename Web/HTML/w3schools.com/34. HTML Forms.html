@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>HTML Forms</title>
+        <style>
+            .form {border:3px solid black;
+                padding:20px;
+
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class='form'>
+            <form>
+                <label for="fname">First name:</label><br>
+                <input type="text" id="fname" name="fname"><br>
+                <label for="lname">Last name:</label><br>
+                <input type="text" id="lname" name="lname">
+              </form>
+        </div>
+        <hr>
+        <div class='form'>
+            <p>Choose your favorite Web language:</p>
+
+            <form>
+              <input type="radio" id="html" name="fav_language" value="HTML">
+              <label for="html">HTML</label><br>
+              <input type="radio" id="css" name="fav_language" value="CSS">
+              <label for="css">CSS</label><br>
+              <input type="radio" id="javascript" name="fav_language" value="JavaScript">
+              <label for="javascript">JavaScript</label>
+            </form>
+        </div>
+        <hr>
+        <div class='form'>
+            <p>What kind of transportaion do you usually use?</p>
+            <form>
+                <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike">
+                <label for="vehicle1"> I ride a bike</label><br>
+                <input type="checkbox" id="vehicle2" name="vehicle2" value="Car">
+                <label for="vehicle2"> I drive a car</label><br>
+                <input type="checkbox" id="vehicle3" name="vehicle3" value="Bus">
+                <label for="vehicle3"> I take a bus</label><br>
+                <input type="checkbox" id="vehicle4" name="vehicle4" value="Subway">
+                <label for="vehicle4"> I take a subway</label>
+              </form>
+        </div>
+        <hr>
+        <div class='form'>
+            <p>Please input your name :</p>
+            <form action="./34. HTML Forms - Submit.html">
+                <label for="fname">First name:</label><br>
+                <input type="text" id="fname" name="fname"><br>
+                <label for="lname">Last name:</label><br>
+                <input type="text" id="lname" name="lname"><br><br>
+                <input type="submit" value="제출">
+              </form>
+        </div>
+        <hr>
+        <div class='form'>
+            <form>
+                <label for="animals">Choose a favorite animal:</label>
+                <select id="animals" name="animals">
+                <option value="dog">Dog</option>
+                <option value="cat">Cat</option>
+                <option value="hamster">Hamster</option>
+                <option value="parrot">Parrot</option>
+                </select>
+                <input type="submit" value="제출">
+            </form>
+        </div>
+        <hr>
+        <div class='form'>
+            <form>
+                <textarea name="message" rows="10" cols="30">
+The cat was playing in the garden.
+                </textarea>
+            </form>
+        </div>
+        <hr>
+        <div class='form'>
+            <button type="button" onclick="alert('Hello World!')">Click Me!</button>
+        </div>
+        <hr>
+        <div class='form'><form>
+            <fieldset>
+              <legend>개인정보:</legend>
+              <label for="fname">First name:</label><br>
+              <input type="text" id="fname" name="fname" value="John"><br>
+              <label for="lname">Last name:</label><br>
+              <input type="text" id="lname" name="lname" value="Doe"><br><br>
+              <input type="submit" value="Submit">
+            </fieldset>
+          </form>
+        </div>
+        
+        </body>
+</html>
