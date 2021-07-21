@@ -14,13 +14,13 @@ Numpy
 
 [Django](Django)
 
-[Web (Crawling, Regular Expression)](Web)
+[Web (HTML, Crawling, Regular Expression)](Web)
 
 [데이터 시각화](Visualization)
 
 [OpenCV](OpenCV)
 
-[Big Data Analysis](Big%20Data%20Analysis)
+[Big Data Analysis (Preprocessing, Machine Learning)](Big%20Data%20Analysis)
 
 [애자일 프로젝트](Agile%20Project)
 
