@@ -10,10 +10,10 @@
 
 - K-Nearest Neighbor Algorithm
 - scikit-learn
-  - `.fit`, `.score`, `.predict`
-  - `train_test_split`, `stratify`
+  - `.fit()`, `.score()`, `.predict()`
+  - `train_test_split()`, `stratify=`
 - numpy
-  - `.shuffle`, `.column_stack`, `.concatenate`
+  - `.shuffle()`, `.column_stack()`, `.concatenate()`
 
 ### 02. 붓꽃 품종 분류
 
@@ -21,5 +21,27 @@
 
 ### 03. 프레임워크
 
+### 04. Model Selection
 
+- 홀드 아웃
+- 교차 검증
+  - `KFold`, `n_splits=`
+  - `cross_val_score()`
+- 하이퍼 파라미터
+  - `GridSearchCV`
+    - `.cv_results_`, `.best_params_`, `.best_score_`, `.best_estimator_`
+
+### 05. 데이터 전처리
+
+- 레이블 인코딩
+  - `LabelEncoder`, `.fit()`, `.transform()`
+  - `.classes_`, `.inverse_transform()`
+- 원-핫 인코딩
+  - `OneHotEncoder`
+  - Pandas
+    - `.get_dummies()`, .`to_numpy()`
+
+### 06. 타이타닉 생존자 예측
+
+- `.fillna()`
 

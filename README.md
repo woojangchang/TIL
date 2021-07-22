@@ -32,6 +32,8 @@ Numpy
 
 파이썬 통계분석(~21.06.20) → SQL 데이터 전처리 분석(~21.07.01) → Django → 크롤러, 스크레이핑
 
+파이썬 머신러닝
+
 
 
 ## 자주 쓰는 것
@@ -45,4 +47,13 @@ Numpy
 5. `conda install -c conda-forge jupyterlab`
 
 - 삭제 : `conda remove --name <name> --all`
+
+### Github
+
+#### Github에 업로드된 파일이나 폴더 없애기
+
+- `.gitignore에 파일/폴더 명 추가`
+-  `git rm --cached -r .`
+- `git add .`
+- `git commit -m '.gitignore modified'`
 

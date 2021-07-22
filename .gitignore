@@ -4,6 +4,7 @@
 ### Custom ###
 secrets.json
 .idea/
+data/
 
 ### Django ###
 *.log
