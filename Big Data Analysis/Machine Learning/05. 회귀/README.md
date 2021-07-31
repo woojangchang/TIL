@@ -14,6 +14,10 @@
   - `Pipeline([('poly', PolynomialFeatures(degree=3)), ('linear', LinearRegression())])`
 - 릿지 회귀
   - `Ridge(alpha)`
+- 라쏘 회귀
+  - `Lasso(alpha)`
+- 엘라스틱넷 회귀
+  - `ElasticNet(alpha, l1_ratio)`
 - 로지스틱 회귀
   - `LogisticRegression(penalty='l2', C=1.0)`
     - `penalty` : 규제 유형으로 'l1', 'l2', 'elasticnet'이 있음
