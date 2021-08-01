@@ -20,7 +20,9 @@ Numpy
 
 [OpenCV](OpenCV)
 
-[Big Data Analysis (Preprocessing, Machine Learning)](Big%20Data%20Analysis)
+[Big Data Analysis (Preprocessing)](Big%20Data%20Analysis)
+
+[Big Data Analysis (Machine Learning)](Big%20Data%20Analysis/Machine%20Learning)
 
 [애자일 프로젝트](Agile%20Project)
 
@@ -32,7 +34,7 @@ Numpy
 
 파이썬 통계분석(~21.06.20) → SQL 데이터 전처리 분석(~21.07.01) → Django → 크롤러, 스크레이핑
 
-파이썬 머신러닝
+파이썬 머신러닝 → 케라스 딥러닝
 
 
 
