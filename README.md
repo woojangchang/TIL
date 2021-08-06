@@ -24,6 +24,8 @@ Numpy
 
 [Big Data Analysis (Machine Learning)](Big%20Data%20Analysis/Machine%20Learning)
 
+[Big Data Analysis (Deep Learning)](Big%20Data%20Analysis/Deep%20Learning)
+
 [애자일 프로젝트](Agile%20Project)
 
 

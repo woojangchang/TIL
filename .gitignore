@@ -5,6 +5,7 @@
 secrets.json
 .idea/
 data/
+datasets/
 
 ### Django ###
 *.log
