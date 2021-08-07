@@ -46,7 +46,7 @@ google colab 환경으로 진행
 - 대응책 : 다른 함수 사용
   - Tanh, ReLU, Leaky ReLU
 
-  ![그림입니다.  원본 그림의 이름: CLP00002ef80034.bmp  원본 그림의 크기: 가로 655pixel, 세로 572pixel](file:///C:\Users\master\AppData\Local\Temp\tmp4C39.jpg)  
+  ![](README.assets/tmp4C39.jpg)  
 
 # Optimization Method
 
@@ -436,4 +436,182 @@ datagen = ImageDataGenerator(rotation_range = 40,
 * horizontal_flip = True : 수평방향 뒤집기
 * vertical_flip = True : 수직방향 뒤집기
 * fill_mode = 'nearest' : 주변 픽셀로 이미지 채우기
+
+### Transfer Learning
+
+- 전이 학습 : 다른 모델에서 훈련된 파라미터를 가져와 사용하는 것
+- keras에서 VGGNet 모델을 가져와 사용할 수 있음
+  - 2014 ILSVC 대회(이미지 분류 대회) 준우승
+
+```python
+from tensorflow.keras.applications import VGG16
+
+conv_base = VGG16(weights = 'imagenet',
+                  include_top = False,
+                  input_shape = (150, 150, 3))
+```
+
+- include_top = False : DNN 파트를 제외하고 가져오는 옵션
+
+#### Featrue Extraction
+
+```python
+for inputs_batch, labels_batch in generator:
+    features_batch = conv_base.predict(inputs_batch)
+    features[i * batch_size : (i + 1) * batch_size] = features_batch
+    labels[i * batch_size : (i + 1) * batch_size] = labels_batch
+    i += 1
+    if i * batch_size >= sample_count:
+        break
+```
+
+- 내가 가진 이미지의 feature를 추출하는 작업을 기존 모델로 수행하도록 하는 코드
+- 실제로 분류 모델을 구현할 때는 필요 없음
+
+#### Fine Tuning
+
+- 미세 조정
+- 특정 layer를 freeze(파라미터를 고정) 하고 나머지 파라미터를 내가 가진 데이터셋으로 학습시키는 과정
+- 일반적으로 마지막 단계의 layer들을 제외한 나머지를 freeze한다.
+- [ipynb](06-02-04_CNN_Dogs_and_Cats_VGG16_Fine_Tuning_GPU.ipynb)
+
+```python
+set_trainable = False
+
+for layer in conv_base.layers:
+    if layer.name == 'block5_conv1':
+        set_trainable = True
+        
+    if set_trainable:
+        layer.trainable = True
+    else:
+        layer.trainable = False
+```
+
+- layer.trainable = False : Freeze
+
+|                                      | Loss    | Accuracy | Time                      |
+| ------------------------------------ | ------- | :------- | ------------------------- |
+| CNN                                  | 2.57071 | 0.74400  | 7min 10s                  |
+| CNN + Agumentation<br />(200 Epochs) | 0.60649 | 0.79400  | 41min 2s<br />(20min 57s) |
+| VGG16 + Fine Tuning                  | 0.44011 | 0.93000  | 18min 46s                 |
+| VGG16 + NoFreeze                     | 0.28946 | 0.95300  | 33min 38s                 |
+
+- 정확도는 VGG16 전체 파라미터를 업데이트 시키는 것이 제일 높으나 시간이 오래 걸리기 때문에, 정확도 차이가 적은 편인 Fine Tuning 방법을 가장 추천
+
+# RNN
+
+- Recurrent Neural Network
+- 순환 신경망
+- 직전 단계의 기억(Short-Term Memory)을 사용하여 학습
+- 연속적 데이터 처리(시계열, 언어 등)를 위해 이전 단계의 output을 다음 데이터에 더하여 계산
+- 모든 Sequence에서 가중치를 공유![image-20210807200250516](README.assets/image-20210807200250516.png)
+
+```python
+from tensorflow.keras import models, layers
+
+model_1 = models.Sequential(name = 'SimpleRNN_1')
+model_1.add(layers.SimpleRNN(3,
+                             input_shape = (5, 1), 
+                             return_sequences = False))
+model_1.add(layers.Dense(1))
+```
+
+- Unit(output_dim) : 3
+- input_shape(input_lenght, input_dim) : (5, 1)
+- **return_sequences = False** : 최종 Unit만 출력
+  - True로 하면 각각의 h가 출력됨
+- layers.Dense(1) : y_hat
+
+## Stacked RNN
+
+- 여러 겹의 RNN을 쌓아 학습시키는 방법
+
+```python
+model_3 = models.Sequential(name = 'Stackd_RNN')
+model_3.add(layers.SimpleRNN(3,
+                             input_shape = (None, 1), 
+                             return_sequences = True))
+model_3.add(layers.SimpleRNN(3,
+                             input_shape = (None, 1),
+                             return_sequences = False))
+model_3.add(layers.Dense(1))
+
+model_3.summary()
+```
+
+- 첫 번째 RNN의 output은 다음 RNN의 input이 되므로 return_sequences=True로 줘야 함
+- [ipynb](07-01_SimpleRNN_Test_Code_CPU.ipynb)
+
+# LSTM
+
+- Long Short-Term Memory
+- RNN의 단점인 입력 데이터가 길어질수록 학습 능력이 하락하는 것을 해결
+  - Vanishing Gradient / Expoding Gradient Issue
+- Gate 구조로 tanh, sigmoid 함수를 사용하여
+  - tanh (-1 ~ 1) - 다음 단계에 얼마나 중요한가를 조정
+  - sigmoid - (0 ~ 1) - 다음 단계에 얼마나 반영할지를 조정함
+  - Forget Gate, Input Gate, Output Gate, Gate 네 종류가 있음
+
+```python
+model = Sequential(name = 'LSTM')
+model.add(LSTM(64, 
+               input_shape = (None, 1)))
+model.add(Dense(1, activation = 'tanh'))
+```
+
+- RNN과 마찬가지로 activation을 명시해줄 필요 없음
+
+- RNN과 마찬가지로 tensor 형태로 train data를 reshape 후 넣어줘야함
+
+  - ```python
+    train_X = np.reshape(train_X, (train_X.shape[0], train_X.shape[1], 1))
+    test_X = np.reshape(test_X, (test_X.shape[0], test_X.shape[1], 1))
+    ```
+
+- 시계열 데이터는 train_test_split 함수를 사용하면 안 됨
+
+## Stacked LSTM
+
+- 여러 겹의 LSTM을 쌓아 학습시키는 방법
+
+```python
+model = Sequential(name = 'Stackd_LSTM')
+model.add(LSTM(64, 
+               input_shape = (None, 1), 
+               return_sequences = True))
+model.add(LSTM(64,
+               input_shape = (None, 1),
+               return_sequences = False))
+model.add(Dense(1, activation = 'tanh'))
+```
+
+- Stacked RNN과 마찬가지로 첫 LSTM에서 return_sequences=True로 줘야함
+
+## Bidirectional LSTM
+
+- 데이터를 정방향(01234...)으로 학습시킬 뿐만 아니라 역방향(98765...)으로도 학습시키는 방법
+
+```python
+model = Sequential(name = 'Bidirectional_LSTM')
+model.add(Bidirectional(LSTM(64,
+                             input_shape = (None, 1))))
+model.add(Dense(1, activation = 'tanh'))
+```
+
+|                    | Loss (MSE)           |
+| ------------------ | -------------------- |
+| LSTM               | 0.01241739746183157  |
+| Stacked LSTM       | 0.015957944095134735 |
+| Bidirectional LSTM | 0.007861657068133354 |
+| DNN                | 0.008725888095796108 |
+
+- DNN이 LSTM보다 좋아보일 수 있고, 실제로 180일로 학습한 다음날의 온도를 예측하기는 DNN이 더 우수한 그래프 모양을 나타냈으나, 예측한 온도들을 쌓아서 더 먼 미래를 예측하는데는 LSTM이 더 좋은 그래프 모습을 나타냄
+- 시계열 데이터를 학습할 때는 오히려 딥러닝보다 facebook prophet이 더 좋은 성능을 보일 때가 많음
+
+## GRU
+
+- Gated Recurrent Unit
+- LSTM Memory Cell이 간소화된 버전
+  - 성능이 LSTM보다 좋지 않아 자주 사용되지 않음
 
