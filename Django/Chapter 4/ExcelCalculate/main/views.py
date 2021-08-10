@@ -5,7 +5,10 @@ from sendEmail.views import *
 
 # Create your views here.
 def index(request):
-    return render(request, 'main/index.html')
+    if 'user_name' in request.session.keys():
+        return render(request, 'main/index.html')
+    else:
+        return redirect('main_signin')
 
 def signup(request):
     return render(request, 'main/signup.html')
@@ -32,6 +35,23 @@ def join(request):
 def signin(request):
     return render(request, 'main/signin.html')
 
+def login(request):
+    loginEmail = request.POST['loginEmail']
+    loginPW = request.POST['loginPW']
+    try:
+        user = User.objects.get(user_email = loginEmail)
+    except:
+        return redirect('main_loginFail')
+    if user.user_password == loginPW and user.user_validate:
+        request.session['user_name'] = user.user_name
+        request.session['user_email'] = user.user_email
+        return redirect('main_index')
+    else:
+        return redirect('main_loginFail')
+
+def loginFail(request):
+    return render(request, 'main/loginFail.html')
+
 def verifyCode(request):
     return render(request, 'main/verifyCode.html')
 
@@ -46,7 +66,9 @@ def verify(request):
         response = redirect('main_index')
         response.delete_cookie('code')
         response.delete_cookie('user_id')
-        response.set_cookie('user', user)
+        # response.set_cookie('user', user)
+        request.session['user_name'] = user.user_name
+        request.session['user_email'] = user.user_email
         return response
     else:
         msg = '입력한 코드를 다시 확인해 주세요.'
@@ -54,4 +76,17 @@ def verify(request):
         return render(request, "main/verifyCode.html", content)
 
 def result(request):
-    return render(request, 'main/result.html')
+    if 'user_name' in request.session.keys():
+        content = {}
+        content['grade_calculate_dic'] = request.session['grade_calculate_dic']
+        content['email_domain_dic'] = request.session['email_domain_dic']
+        del request.session['grade_calculate_dic']
+        del request.session['email_domain_dic']
+        return render(request, 'main/result.html', content)
+    else:
+        return redirect('main_signin')
+        
+def logout(request):
+    del request.session['user_name']
+    del request.session['user_email']
+    return redirect('main_signin')
