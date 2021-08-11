@@ -1,3 +1,17 @@
+- [Chapter 4](#chapter-4)
+  * [1.2 Start App](#12-start-app)
+  * [1.3 CRUD](#13-crud)
+  * [1.4 Register](#14-register)
+  * [1.5 Login / Logout](#15-login---logout)
+  * [1.6 Upload File](#16-upload-file)
+  * [1.7 Pandas](#17-pandas)
+  * [1.8 Complete Project](#18-complete-project)
+  * [2.1 Login Encrypted](#21-login-encrypted)
+  * [2.2 Templates](#22-templates)
+  * [2.3 File Upload](#23-file-upload)
+  * [2.4 File Download](#24-file-download)
+  * [2.5 Develop App by Myself](#25-develop-app-by-myself)
+
 # Chapter 4
 
 ## 1.2 Start App
@@ -530,4 +544,231 @@ def loginFail(request):
 </body>
 </html>
 ```
+
+## 2.1 Login Encrypted
+
+- 사용자의 패스워드 - 단방향 암호화
+  - SHA-256 방식으로 암호화
+- hashlib 라이브러리 사용
+- main/views.py
+
+```python
+import hashlib
+
+def join(request):
+    print(request)
+    name = request.POST['signupName']
+    email = request.POST['signupEmail']
+    pw = request.POST['signupPW']
+    # pw encryption
+    encoded_pw = pw.encode()
+    encrypted_pw = hashlib.sha256(encoded_pw).hexdigest()
+
+    user = User(user_name=name, user_email=email, user_password=encrypted_pw)
+    user.save()
+
+    code = randint(1000, 9999)
+    
+def login(request):
+    loginEmail = request.POST['loginEmail']
+    loginPW = request.POST['loginPW']
+    try:
+        user = User.objects.get(user_email = loginEmail)
+    except:
+        return redirect('main_loginFail')
+    # 사용자가 입력한 PW 암호화
+    encoded_loginPW = loginPW.encode()
+    encrypted_loginPW = hashlib.sha256(encoded_loginPW).hexdigest()
+    if user.user_password == loginPW and user.user_validate:
+```
+
+- 인코딩 후 sha256함수에 인코딩 문자열을 전달, 16진수 문자열로 받기 위해 hexdigest() 함수 호출
+- join, login 모두 암호화
+
+## 2.2 Templates
+
+- error.html
+
+```html
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Boot strap -->
+    <!-- 합쳐지고 최소화된 최신 CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <!-- 부가적인 테마 -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+    <!-- 합쳐지고 최소화된 최신 자바스크립트 -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+    <style>
+        .panel-footer{
+            height:10%;
+            color:gray;
+        }
+    </style>
+    <title>Excel Calculate</title>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="page-header">
+                <a href="/" class="btn btn-default btn-xs" style="margin: 10px">메인화면</a>
+                <h1>Excel Calculate <small>with Django</small></h1>
+            </div>
+        </div>
+        <div class='body'>
+            <h1>오류가 발생했어요 :'(</h1>
+            <h4>{{ message }}</h4>
+        </div>
+        <div class="panel-footer">
+            실전예제로 배우는 Django. Project3-ExcelCalculate
+        </div>
+    </div>
+</body>
+</html>
+```
+
+- main/views.py - 이메일 발송 실패 시, error.html 페이지로 이동
+
+```python
+def join(request):
+    print(request)
+    name = request.POST['signupName']
+    email = request.POST['signupEmail']
+    pw = request.POST['signupPW']
+
+    try:
+        user = User.objects.get(user_email=email)
+        if user.user_validate:
+            return HttpResponse("이미 가입된 이메일입니다.")
+        else:
+            user.delete()
+    except:
+        pass
+
+    # pw encryption
+    encoded_pw = pw.encode()
+    encrypted_pw = hashlib.sha256(encoded_pw).hexdigest()
+
+    user = User(user_name=name, user_email=email, user_password=encrypted_pw)
+    user.save()
+
+    code = randint(1000, 9999)
+    response = redirect('main_verifyCode')
+    response.set_cookie('code', code)
+    response.set_cookie('user_id', user.id)
+
+    send_result = send(email, code)
+    if send_result:
+        return response
+    else:
+        content = {'message':'이메일 발송에 실패했습니다.'}
+        return render(request, 'main/error.html', content)
+```
+
+- 책에 render('main/error.html', content)로 되어있는데, request가 빠졌다.
+- 회원 가입할 때, 이미 있는 이메일인데 인증되었다면 이미 있는 이메일 주소라는 페이지로 이동
+- 인증되지 않았다면 기존의 user 데이터를 삭제하고 새로 이메일 인증 발송
+- 없는 이메일이면 user 데이터에 추가
+
+## 2.3 File Upload
+
+- static files : 이미지, css, js 파일 등
+  - 웹 서비스에서 사용자에게 제공하기 위한 준비된 파일
+- media files : 주로 사용자가 직접 업로드 하는 파일
+- settings.py - media files 관련 설정 추가
+
+```python
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.2/howto/static-files/
+
+STATIC_URL = '/static/'
+
+# Media files
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+```
+
+- MEDIA_ROOT : media files의 최상위 경로
+- MEDIA_URL : 업로드한 파일을 저장할 때 사용하기 위한 url 형태의 문자열
+- calculate/models.py
+
+```python
+from django.db import models
+
+# Create your models here.
+class Document(models.Model):
+    user_upload_file = models.FileField(upload_to='user_upload_files/%Y%m%d/')
+```
+
+- 파일이 저장되는 경로 : MEDIA_ROOT/user_upload_files/20210811/
+- calculate/views.py
+
+```python
+def calculate(request):
+    doc = request.FILES
+    # print(doc)
+    file = doc['fileInput']
+    # print('# 사용자가 등록한 파일의 이름 :', file)
+
+    # 파일 저장
+    origin_file_name = file.name
+    user_name = request.session['user_name']
+    now_HMS = datetime.today().strftime('%H%M%S')
+    file_upload_name = now_HMS + '_' + user_name + '_' + origin_file_name
+    file.name = file_upload_name
+    document = Document(user_upload_file = file)
+    document.save()
+```
+
+- 파일 구분을 위해 업로드 시간, 유저의 이름을 기존 파일명에 추가
+- calculate/admin.py
+
+```python
+from django.contrib import admin
+from .models import *
+
+# Register your models here.
+
+admin.site.register(Document)
+```
+
+- admin 페이지에 calculate 필드가 추가됨
+- 이후 migrate
+
+## 2.4 File Download
+
+- 예시 코드
+
+```python
+def download(request):
+    path = request.GET['path']
+    file_path = os.path.join(settings.MEDIA_ROOT, path)
+    
+    if os.path.exists(file_path):
+        binary_file = open(file_path, 'rb')
+        response = HttpResponse(binary_file.read(), content_type="application/liquid; charset=utf-8")
+        response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(file_path)
+    	return response
+    
+    else:
+        message = '알 수 없는 오류가 발생했습니다.'
+        return render(request, 'main/error.html', {'message':message})
+```
+
+- content_type : 전달하려는 것과 인코딩 방법을 알려줌
+- Content-disposition : 사용자에게 response를 어떻게 보여줄지 설정
+  - 다운받을 수 있도록 attachment 사용
+  - 웹 페이지에 화면이 표현되게 하려면 inline 이용
+- 그 외에
+  - Content-language : 사용자 언어
+  - Content-length : 전달되는 개체의 바이트 길이, 크기
+  - Content-Security-Policy : 외부에서 파일을 가져올 경우 차단할 소스와 불러올 소스 명시
+    - 허용한 외부 소스를 지정함으로써 XSS 공격 등을 방어하여 보안성 향상
+
+## 2.5 Develop App by Myself
+
+- 앱 배포하기 (생략)
 
