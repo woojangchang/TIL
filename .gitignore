@@ -7,6 +7,7 @@ secrets.json
 data/
 datasets/
 models/
+problems/
 
 ### Django ###
 *.log
