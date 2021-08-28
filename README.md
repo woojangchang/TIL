@@ -22,11 +22,11 @@ Numpy
 
 [OpenCV](OpenCV)
 
-[Big Data Analysis (Preprocessing)](Big%20Data%20Analysis)
+[Big Data Analysis](Big%20Data%20Analysis)
 
-[Big Data Analysis (Machine Learning)](Big%20Data%20Analysis/Machine%20Learning)
+[Machine Learning](Machine%20Learning)
 
-[Big Data Analysis (Deep Learning)](Big%20Data%20Analysis/Deep%20Learning)
+[Deep Learning](Deep%20Learning)
 
 [애자일 프로젝트](Agile%20Project)
 
