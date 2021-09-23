@@ -8,6 +8,7 @@ data/
 datasets/
 models/
 problems/
+my_log_dir/
 
 ### Django ###
 *.log
