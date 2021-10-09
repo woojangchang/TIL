@@ -40,6 +40,16 @@ Numpy
 
 
 
+## 공부해야 할 것
+
+> 간단하게라도 기본 지식은 갖고 있자
+
+Visualization(Matplotlib, Plotly)
+
+자동화(Apache Airflow)
+
+
+
 ## 공부 끝
 
 > 책의 내용 전체를 한 번 경험했을 뿐, 절대 끝이 아니다.
