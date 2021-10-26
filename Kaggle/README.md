@@ -32,3 +32,97 @@ https://www.kaggle.com/alexisbcook/data-leakage
 
 ![img](https://postfiles.pstatic.net/MjAxNzA4MzBfMjAz/MDAxNTA0MDk1MDE4NDU2.3Gx0IVIcMk9rlkxQv0bqlOFLUM30Dv5i0lsEimrBPygg.qExWYpz8_3UxQtEZytqAUbo0RELqmySAulqnCYclAzog.PNG.tjdudwo93/2.PNG?type=w3)
 
+# Scatter Plots
+
+## scatterplot
+
+산점도를 확인할 때 사용
+
+```python
+sns.scatterplot(data=candy_data, x='sugarpercent', y='winpercent')
+```
+
+![image-20211026164755679](README.assets/image-20211026164755679.png)
+
+
+
+카테고리별로 색을 다르게 하고 싶을 땐 `hue` 파라미터 이용
+
+```python
+sns.scatterplot(data=candy_data, x='pricepercent', y='winpercent', hue='chocolate')
+```
+
+![image-20211026164907449](README.assets/image-20211026164907449.png)
+
+## regplot
+
+산점도에 회귀직선까지 함께 나타내고 싶을 때 사용
+
+```python
+sns.regplot(data=candy_data, x='sugarpercent', y='winpercent')
+```
+
+![image-20211026164828986](README.assets/image-20211026164828986.png)
+
+## lmplot
+
+산점도에 회귀직선을 카테고리별로 따로 나타내고 싶을 때 사용
+
+```python
+sns.lmplot(data=candy_data, x='pricepercent', y='winpercent', hue='chocolate')
+```
+
+![image-20211026165020858](README.assets/image-20211026165020858.png)
+
+## swarmplot
+
+카테고리 변수마다 수치형 변수가 어떻게 모여있는지 (분포를) 확인하려고 할 때 사용
+
+```python
+sns.swarmplot(data=candy_data, x='chocolate', y='winpercent')
+```
+
+![image-20211026165154842](README.assets/image-20211026165154842.png)
+
+# Distributions
+
+## distplot
+
+값의 분포를 알아보기 위할 때 사용
+
+```python
+sns.distplot(a=iris_data['Petal Length (cm)'], kde=False)
+```
+
+![image-20211026170823267](README.assets/image-20211026170823267.png)
+
+## kdeplot
+
+**kernel density estimate (KDE)**, 값의 분포를 부드러운 곡선으로 나타내기 위할 때 사용
+
+```python
+sns.kdeplot(data=iris_data['Petal Length (cm)'], shade=True)
+```
+
+- `shade=True` : 곡선 아래 면적을 색칠
+
+![image-20211026170830498](README.assets/image-20211026170830498.png)
+
+## jointplot
+
+2개의 분포를 겹쳐 등고선을 그리고자 할 때 사용
+
+```python
+sns.jointplot(x=iris_data['Petal Length (cm)'], y=iris_data['Sepal Width (cm)'], kind="kde")
+```
+
+![image-20211026170913858](README.assets/image-20211026170913858.png)
+
+# Custom Styles
+
+```python
+sns.set_style("dark")
+```
+
+- (1) `"darkgrid"`, (2) `"whitegrid"`, (3) `"dark"`, (4) `"white"`, (5) `"ticks"` 등이 있음
+
