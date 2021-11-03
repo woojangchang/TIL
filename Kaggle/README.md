@@ -359,3 +359,40 @@ customer[["State", "StateFreq"]].head(10)
 
 주의할 점 : train, valid로 나누었을 때 Data Leakage를 주의하여 train에서 생성한 특성을 valid에 붙여야 한다.
 
+
+
+
+
+# Principal Component Analysis
+
+PCA를 통해 차원 축소, 잡음(노이즈) 제거 등을 할 수도 있고 '이상치 탐지'도 가능하다.
+
+주택 가격 데이터에서 `"GarageArea"`, `"YearRemodAdd"`, `"TotalBsmtSF"`, `"GrLivArea"` feature로 PCA(n_component=4)를 했을 때 각각의 PCA component로 boxplot을 그려보면 다음과 같다.
+
+```python
+sns.catplot(
+    y="value",
+    col="variable",
+    data=X_pca.melt(),
+    kind='boxen',
+    sharey=False,
+    col_wrap=2,
+);
+```
+
+![image-20211103143204249](README.assets/image-20211103143204249.png)
+
+
+
+PC1에 대하여 값이 큰 이상치를 뽑았을 때 다음과 같으며
+
+|      | SalePrice | Neighborhood | SaleCondition | GarageArea | YearRemodAdd | TotalBsmtSF | GrLivArea |
+| ---: | --------: | -----------: | ------------: | ---------: | -----------: | ----------: | --------- |
+| 1498 |    160000 |      Edwards |       Partial |     1418.0 |         2008 |      6110.0 | 5642.0    |
+| 2180 |    183850 |      Edwards |       Partial |     1154.0 |         2009 |      5095.0 | 5095.0    |
+| 2181 |    184750 |      Edwards |       Partial |      884.0 |         2008 |      3138.0 | 4676.0    |
+| 1760 |    745000 |   Northridge |       Abnorml |      813.0 |         1996 |      2396.0 | 4476.0    |
+| 1767 |    755000 |   Northridge |        Normal |      832.0 |         1995 |      2444.0 | 4316.0    |
+
+`Edwards` 이웃의 `Partial` 판매 상태인 것은 여러 명이 공동 소유하는 주택인 경우 일부를 판매하는 것이기 때문에 `SalePrice`가 정상가보다 낮을 수밖에 없으며 이는 이상치이고 제거하는 것이 맞다.
+
