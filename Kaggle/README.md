@@ -396,3 +396,211 @@ PC1에 대하여 값이 큰 이상치를 뽑았을 때 다음과 같으며
 
 `Edwards` 이웃의 `Partial` 판매 상태인 것은 여러 명이 공동 소유하는 주택인 경우 일부를 판매하는 것이기 때문에 `SalePrice`가 정상가보다 낮을 수밖에 없으며 이는 이상치이고 제거하는 것이 맞다.
 
+
+
+
+
+# SQL
+
+## Select, From & Where
+
+- `unit`이 ppm인 모든 행의 `country` 열 출력
+
+  ```mysql
+  SELECT country
+  FROM `bigquery-public-data.openaq.global_air_quality`
+  WHERE unit = 'ppm';
+  ```
+
+- `unit`이 ppm인 모든 행의 unique `country` 출력
+
+  ```mysql
+  SELECT DISTINCT country
+  FROM `bigquery-public-data.openaq.global_air_quality`
+  WHERE unit = 'ppm';
+  ```
+
+- `value`가 0인 모든 열과 행 출력
+
+  ```mysql
+  SELECT *
+  FROM `bigquery-public-data.openaq.global_air_quality`
+  WHERE value = 0;
+  ```
+
+- **LIKE** - 특정 텍스트 필터링
+
+  ```mysql
+  SELECT *
+  FROM `bigquery-public-data.pet_records.pets`
+  WHERE Name LIKE 'Ripley';
+  ```
+
+- **LIKE '%...%'** - 텍스트가 포함된 행 필터링
+
+  ```mysql
+  SELECT *
+  FROM `bigquery-public-data.pet_records.pets`
+  WHERE Name LIKE '%ipl%';
+  ```
+
+  
+
+
+
+## Group By, Having & Count
+
+- **COUNT()** - 개수 파악
+
+  ```mysql
+  SELECT COUNT(ID)
+  FROM `bigquery-public-data.pet_records.pets`;
+  ```
+
+  - COUNT() 외에 SUM(), AVG(), MIN(), MAX() 등이 있음
+
+- **GROUP BY** - 그룹으로 묶은 뒤 aggregate function 적용
+
+  ```mysql
+  SELECT Animal, COUNT(ID)
+  FROM `bigquery-public-data.pet_records.pets`
+  GROUP BY Animal;
+  ```
+
+- **GROUP BY ... HAVING** - 그룹으로 묶고 함수를 적용한 결과에 대해 필터링
+
+  ```mysql
+  SELECT Animal, COUNT(ID)
+  FROM `bigquery-public-data.pet_records.pets`
+  GROUP BY Animal
+  HAVING COUNT(ID) > 1;
+  ```
+
+- COUNT column 명을 `NumPosts`로 바꾸고, 같은 column 명(`author`)을 반복하지 않기 위해 다음과 같이 사용할 수 있음
+
+  ```mysql
+  SELECT author, COUNT(1) AS NumPosts
+  FROM `bigquery-public-data.hacker_news.comments`
+  GROUP BY 1
+  HAVING COUNT(1) > 10000;
+  ```
+
+  - SELECT와 HAVING 문의 **COUNT(1)**은 **COUNT(\*)**와 같다.
+  - GROUP BY 문의 **1**은 선택한 **첫 번째 열**을 뜻한다.
+
+## Order By
+
+- **ORDER BY** - `Animal`에 대하여 오름차순 정리
+
+  ```mysql
+  SELECT ID, Name, Animal
+  FROM `bigquery-public-data.pet_records.pets`
+  ORDER BY Animal;
+  ```
+
+- **ORDER BY ... DESC** - `Animal`에 대하여 내림차순 정리
+
+  ```mysql
+  SELECT ID, Name, Animal
+  FROM `bigquery-public-data.pet_records.pets`
+  ORDER BY Animal DESC;
+  ```
+
+- **EXTRACT(DAY from ...)** - 년-월-일(YYYY-[M]M-[D]D) 데이터에서 일 데이터 추출
+
+  ```mysql
+  SELECT Name, EXTRACT(DAY from Date) AS DAY
+  FROM `bigquery-public-data.pet_records.pets_with_date`;
+  ```
+
+  - `YEAR` : 년도 추출
+  - `MONTH` : 월 추출
+  - `DAY` : 일 추출
+  - `WEEK` : 1년 중 몇 번째 주인지 추출
+  - `DAYOFWEEK` : 요일 추출
+
+  요일별로 사고 횟수를 확인하고 많은 순서대로 내림차순 정렬
+
+  ```mysql
+  SELECT COUNT(consecutive_number) AS num_accidents, 
+         EXTRACT(DAYOFWEEK FROM timestamp_of_crash) AS day_of_week
+  FROM `bigquery-public-data.nhtsa_traffic_fatalities.accident_2015`
+  GROUP BY day_of_week
+  ORDER BY num_accidents DESC;
+  ```
+
+- WHERE, GROUP BY ... HAVING과 ORDER BY를 함께 쓰는 경우
+
+  ```mysql
+  SELECT indicator_code, indicator_name, COUNT(1) AS num_rows
+  FROM `bigquery-public-data.world_bank_intl_education.international_education`
+  WHERE year = 2016
+  GROUP BY 1, 2
+  HAVING num_rows >= 175
+  ORDER BY 3 DESC;
+  ```
+
+  
+
+## As & With
+
+- **WITH ... AS** - CTE(common table expression)으로 임시 테이블을 일컫는다.
+
+  `Seniors`라는 새로운 TABLE 생성
+
+  ```mysql
+  WITH Seniors AS
+  (
+    SELECT ID, NAME
+    FROM `bigquery-public-data.pet_records.pets`
+    WHERE Years_old > 5
+  )
+  SELECT ID
+  FROM Seniors;
+  ```
+
+  쿼리가 너무 길어질 경우를 생각하여 CTE를 생성한다.
+
+  주의점 : 쿼리 내에서만 호출할 수 있으며 다른 쿼리에서는 호출할 수 없다.
+
+- **DATE()** - 년월일-시간 데이터에서 년월일만 추출
+
+- 아래처럼 복잡할 때 주로 사용한다.
+
+  특정 조건에 해당하는 날짜에 대하여 시간, 마일, 초 데이터를 뽑아낸 뒤 시간으로 묶어서 새로운 데이터 생성
+
+  ```mysql
+  WITH RelevantRides AS
+  (
+     SELECT EXTRACT(HOUR FROM trip_start_timestamp) AS hour_of_day, trip_miles, trip_seconds
+     FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
+     WHERE trip_seconds > 0
+       AND trip_miles > 0
+       AND trip_start_timestamp > '2017-01-01'
+       AND trip_start_timestamp < '2017-07-01'
+  )
+  SELECT hour_of_day,
+  	   COUNT(1) AS num_trips,
+  	   3600 * SUM(trip_miles) / SUM(trip_seconds) AS avg_mph
+  FROM RelevantRides
+  GROUP BY 1
+  ORDER BY 1;
+  ```
+
+  
+
+## Joining Data
+
+아래와 같이 `owners` 테이블의 `Pet_ID`와 `pets` 테이블의 `ID`가 서로 이어져 있을 때 join을 사용하여 합칠 수 있다.
+
+![img](https://i.imgur.com/eXvIORm.png)
+
+- **JOIN**
+
+  ```mysql
+  SELECT p.Name AS Pet_Name, o.Name AS Owner_Name
+  FROM `bigquery-public-data.pet_records.pets` AS p
+  INNER JOIN `bigquery-public-data.pet_records.owners` AS o
+  	ON p.ID = o.Pet_ID;
+  ```
+
