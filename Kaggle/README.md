@@ -604,3 +604,166 @@ PC1에 대하여 값이 큰 이상치를 뽑았을 때 다음과 같으며
   	ON p.ID = o.Pet_ID;
   ```
 
+
+
+## JOINs and UNIONs
+
+- **JOINs** - 데이터를 (공통)행 기준으로 합침
+
+  - `INNER JOIN` : 공통인 데이터 기준으로 합침
+  - `LEFT JOIN` : 왼쪽(FROM 다음에 오는) 테이블 기준으로 합침
+  - `FULL JOIN` : 양쪽 테이블 모든 데이터에 대하여 합침
+
+- **UNIONs** - 데이터를 (공통)열(이름) 기준으로 합침
+
+  ```mysql
+  SELECT Age FROM `bigquery-public-data.pet_records.pets`
+  UNION ALL
+  SELECT Age FROM `bigquery-public-data.pet_records.onwers`;
+  ```
+
+  - 중복되는 데이터를 제거하고 싶은 경우 `UNION ALL` 대신 `UNION DISTINCT` 사용
+
+- JOIN을 여러 번 반복할 수 있음
+
+  ![three tables](https://i.imgur.com/OyhYtD1.png)
+
+  ```mysql
+  SELECT o.Name AS Owner_Name,
+  	   p.Name AS Pet_Name,
+  	   t.Treat AS Fav_Treat
+  FROM `bigquery-public-data.pet_records.pets` AS p
+  FULL JOIN `bigquery-public-data.pet_records.owners` AS o
+  	ON p.ID = o.Pet_ID
+  LEFT JOIN `bigquery-public-data.pet_records.treats` AS t
+  	on p.ID = t.Pet_ID;
+  ```
+
+  ![double join](https://i.imgur.com/G6buS7P.png)
+
+
+
+## Analytic Functions
+
+![first_query](https://i.imgur.com/rehp8HM.png)
+
+- **Syntax** - **OVER** 문을 사용하며 세 가지 파트가 있다.
+  - **PARTITION BY** : 서로 다른 그룹으로 나눔
+  - **ORDER BY** : 정렬
+  - **window frame** : 계산에 쓰이는 행을 정의
+
+![first_query](https://i.imgur.com/GjiKlA7.png)
+
+- **(More on) window frame clauses**
+  - 아래 예시 모두 `partition by`로 나뉜 그룹 내에서 계산
+  - `ROWS BETWEEN 1 PRECEDING AND CURRENT ROW` - 현재 행과 그 행 기준 하나 전 값에 대한 결과. 위의 예시에서 두 번째 행의 `avg_time`(28) = 현재 행의 값(26)과 이전 하나 행의 값(30)의 평균. 세 번째 행도 같은 논리로 24 = 26과 22의 평균
+  - `ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING` - 현재 행 기준 세 개의 전 값과 다음 하나 값에 대한 결과
+  - `ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING` - 모든 행
+  - `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` - 누적 행(기본값)
+- **Three types of anayltic functions**
+  1. **Analytic aggregate functions**
+     - **MIN()** (or **MAX()**)
+     - **AVG()** (or **SUM()**)
+     - **COUNT()**
+  2. **Analytic navigation functions**
+     - **FIRST_VALUE()** (or **LAST_VALUE()**)
+     - **LEAD()** (and **LAG()**) - 다음(또는 이전) 행의 값 반환
+       - `LAG(column_name, 1)`처럼 얼마나 이전인지 표기를 해줘야 한다.
+       - `LAG(column_name, 1, 'value')`로 쓰면 `NaN` 대신 `'value'`를 채운다.
+  3. **Analytic numbering functions**
+     - **ROW_NUMBER()** - 몇 번째 행인지 반환(`1`부터 시작)
+     - **RANK()** - 순위 반환(같은 값이면 같은 순위, 다음은 그 수만큼 더해진 값)
+
+
+
+## Nested and Repeated Data
+
+- **Nested Data** : python의 dictionary처럼 중괄호(\{\})로 이루어진 데이터
+
+  ![nested data](https://i.imgur.com/wxuogYA.png)
+
+  - 데이터를 불러올 땐 `Toy.Name`처럼 "Toy" 열의 "Name" 값을 참조한다.
+
+    ![nested data](https://i.imgur.com/eE2Gt62.png)
+
+- **Repeated Data** : python의 list처럼 대괄호(\[\])로 이루어진 데이터
+
+  ![repeated data](https://i.imgur.com/S93FJTE.png)
+
+  - 데이터를 불러올 땐 repeated data를 **UNNEST()** 함수로 감싸준다.
+
+    ![repeated data](https://i.imgur.com/p3fXPxY.png)
+
+- **Nested and repeated data**
+
+  ![repeated data](https://i.imgur.com/psKtza2.png)
+
+  - 데이터를 불러오는 방식은 nested와 repeated를 섞어놓은 것과 같다.
+
+    ![repeated data](https://i.imgur.com/DiMCZaO.png)
+
+  - Nested 안에 또다른 Nested가 있는 경우
+
+    - "hits" 열이 repeated 되어 있고
+    - "hits" 열 안에 "hitNumber", "page", "type"이 nested 되어 있으며
+    - "page" 필드 안에 "pagePath"가 nested 되어 있음
+
+    ```mysql
+    SELECT hits.page.pagePath as path,
+    	COUNT(hits.page.pagePath) as counts
+    FROM `bigquery-public-data.google_analytics_sample.ga_sessions_20170801`, 
+    	UNNEST(hits) as hits
+    WHERE hits.type="PAGE" and hits.hitNumber=1
+    GROUP BY path
+    ORDER BY counts DESC;
+    ```
+
+    |      | path                                        | counts |
+    | :--- | :------------------------------------------ | ------ |
+    | 0    | /home                                       | 1257   |
+    | 1    | /google+redesign/shop+by+brand/youtube      | 587    |
+    | 2    | /google+redesign/apparel/mens/mens+t+shirts | 117    |
+    | 3    | /signin.html                                | 78     |
+    | 4    | /basket.html                                | 35     |
+
+- 장점 : 수행 비용이 비싼 JOIN에 비하여 가볍다.
+
+
+
+## Writing Efficient Queries
+
+- SELECT * FROM ... 대신 필요한 column만 출력하기
+
+- 적은 데이터만 불러오기
+
+  - `station_id`와 `station_name`이 1:1로 이루어진 데이터인 경우, 둘 중 무언가를 요청했다면 다음에도 불러왔던 것에 대하여 계산하도록 해야함
+
+  ```mysql
+  # 좋지 않은 예시
+  # station_name column을 선택했으면서 where와 group by에서 station_id로 검색하여 불필요한 데이터를 호출하였음
+  SELECT MIN(start_station_name) AS start_station_name,
+  	MIN(end_station_name) AS end_station_name,
+  	AVG(duration_sec) AS avg_duration_sec
+  FROM `bigquery-public-data.san_francisco.bikeshare_trips`
+  WHERE start_station_id != end_station_id 
+  GROUP BY start_station_id, end_station_id
+  LIMIT 10;
+  
+  # 올바른 예시
+  SELECT start_station_name,
+  	end_station_name,
+  	AVG(duration_sec) AS avg_duration_sec                  
+  FROM `bigquery-public-data.san_francisco.bikeshare_trips`
+  WHERE start_station_name != end_station_name
+  GROUP BY start_station_name, end_station_name
+  LIMIT 10;
+  ```
+
+- N:N JOIN을 피하기
+
+  - 1:1 JOIN이나 1:N JOIN의 수행시간은 짧은 편이지만 N:N JOIN은 길기 때문에 주의
+
+  ![JOIN](https://i.imgur.com/UsNZZoz.png)
+
+  - JOIN하기 이전에 필터링할 수 있다면 우선적으로 필터링하기(특정 ID의 데이터만 뽑아낸 뒤 JOIN하기)
+
