@@ -809,3 +809,26 @@ PC1에 대하여 값이 큰 이상치를 뽑았을 때 다음과 같으며
 | 0.05            | 128          | 256            | ![increase_batch_size1](README.assets/0.05-128-256.webp) | 배치 사이즈를 늘림<br />→ 안정적으로 학습             |
 | 0.05            | 256          | 256            | ![increase_batch_size2](README.assets/0.05-256-256.webp) | 배치 사이즈=샘플 사이즈<br />→ 매우 안정적으로 학습   |
 
+
+
+
+
+# Computer Vision
+
+## Convolution and ReLU
+
+**Feature extraction**의 구성 요소
+
+1. **Filter** - 이미지로부터 특정한 요소를 걸러냄 (convolution)
+2. **Detect** - 필터링된 이미지로부터 특징을 찾음 (ReLU)
+3. **Condense** - 특징을 강조하기 위하여 이미지를 응축 (maximum pooling)
+
+![An example of the feature extraction process.](https://i.imgur.com/IYO9lqp.png)
+
+
+
+## Maximum Pooling
+
+**Translation Invariance** : Maxpooling을 하면서 **zero-pixels**를 제거하기 때문에 특성 맵에서 위치 정보도 같이 제거하여, input의 위치가 달라져도 output은 같음을 의미한다.
+
+**Global Average Pooling** : `Flatten()` 대신 `GlobalAvgPool2D()`를 하는 경우도 있다. Filter마다 평균값을 내어 그 값에 따라 특정 feature의 유무를 파악할 수 있다(크면 존재, 작으면 존재하지 않음 등)는 관점에서 `Flatten()` 대신 종종 쓰인다고 함.
