@@ -832,3 +832,181 @@ PC1에 대하여 값이 큰 이상치를 뽑았을 때 다음과 같으며
 **Translation Invariance** : Maxpooling을 하면서 **zero-pixels**를 제거하기 때문에 특성 맵에서 위치 정보도 같이 제거하여, input의 위치가 달라져도 output은 같음을 의미한다.
 
 **Global Average Pooling** : `Flatten()` 대신 `GlobalAvgPool2D()`를 하는 경우도 있다. Filter마다 평균값을 내어 그 값에 따라 특정 feature의 유무를 파악할 수 있다(크면 존재, 작으면 존재하지 않음 등)는 관점에서 `Flatten()` 대신 종종 쓰인다고 함.
+
+
+
+
+
+# Time Series
+
+## Trend
+
+시계열에 대하여 고차원 다항 회귀 테이블을 만들어주는 메서드
+
+```python
+from statsmodels.tsa.deterministic import DeterministicProcess
+
+dp = DeterministicProcess(
+    index=tunnel.index,  # dates from the training data
+    constant=True,       # dummy feature for the bias (y_intercept)
+    order=1,             # the time dummy (trend)
+    drop=True,           # drop terms if necessary to avoid collinearity
+)
+# `in_sample` creates features for the dates given in the `index` argument
+X = dp.in_sample()
+
+X.head()
+```
+
+|            | const | trend |
+| :--------- | :---- | :---- |
+| Day        |       |       |
+| 2003-11-01 | 1.0   | 1.0   |
+| 2003-11-02 | 1.0   | 2.0   |
+| 2003-11-03 | 1.0   | 3.0   |
+| 2003-11-04 | 1.0   | 4.0   |
+| 2003-11-05 | 1.0   | 5.0   |
+
+```python
+X = dp.out_of_sample(steps=30)
+```
+
+훈련 데이터에서 벗어난 날짜만큼 생성
+
+
+
+**이동 평균** 계산하기 (pandas의 `rolling` 메서드 이용)
+
+```python
+trend = food_sales.rolling(
+    window=12, # 평균을 계산할 데이터의 개수
+    center=True, # 라벨을 붙일 위치(데이터의 센터)
+    min_periods=6, # 계산에 필요한 최소한의 데이터 개수
+).mean()
+```
+
+
+
+**스플라인 곡선(Spline Curve; 각 구간마다 다른 다항식을 적용하여 원래 함수와 최대한 비슷하게 만드는 것)**을 쉽게 구해주는 라이브러리인 `pyearth`로 Trend 계산하기
+
+```python
+from pyearth import Earth
+
+# Target and features are the same as before
+y = average_sales.copy()
+dp = DeterministicProcess(index=y.index, order=1)
+X = dp.in_sample()
+
+# Fit a MARS model with `Earth`
+model = Earth()
+model.fit(X, y)
+
+y_pred = pd.Series(model.predict(X), index=X.index)
+
+ax = y.plot(**plot_params, title="Average Sales", ylabel="items sold")
+ax = y_pred.plot(ax=ax, linewidth=3, label="Trend")
+```
+
+![image-20211118143516250](README.assets/image-20211118143516250.png)
+
+`order`에 따라 trend의 모양이 달라진다.
+
+
+
+## Seasonality
+
+**Furier feature**를 정하기 위한 방법으로 **periodogram**을 이용할 수 있다. x축에 주기를 놓고 a와 b를 각각 sine, cosine 함수의 계수라고 했을 때 y축에 `(a ** 2 + b ** 2) / 2`를 놓은 것이 periodogram으로, 값이 클수록 해당 주기에 영향을 많이 받는 것으로 생각할 수 있다.
+
+![img](https://i.imgur.com/PK6WEe3.png)
+
+(참고) python으로 preiodogram 그리기
+
+```python
+def plot_periodogram(ts, detrend='linear', ax=None):
+    from scipy.signal import periodogram
+    fs = pd.Timedelta("1Y") / pd.Timedelta("1D")
+    freqencies, spectrum = periodogram(
+        ts,
+        fs=fs,
+        detrend=detrend,
+        window="boxcar",
+        scaling='spectrum',
+    )
+    if ax is None:
+        _, ax = plt.subplots()
+    ax.step(freqencies, spectrum, color="purple")
+    ax.set_xscale("log")
+    ax.set_xticks([1, 2, 4, 6, 12, 26, 52, 104])
+    ax.set_xticklabels(
+        [
+            "Annual (1)",
+            "Semiannual (2)",
+            "Quarterly (4)",
+            "Bimonthly (6)",
+            "Monthly (12)",
+            "Biweekly (26)",
+            "Weekly (52)",
+            "Semiweekly (104)",
+        ],
+        rotation=30,
+    )
+    ax.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
+    ax.set_ylabel("Variance")
+    ax.set_title("Periodogram")
+    return ax
+```
+
+
+
+
+
+
+
+**Furier feature 생성 방법**
+
+1. 직접 만들기
+
+   ```python
+   import numpy as np
+   
+   
+   def fourier_features(index, freq, order):
+       time = np.arange(len(index), dtype=np.float32)
+       k = 2 * np.pi * (1 / freq) * time
+       features = {}
+       for i in range(1, order + 1):
+           features.update({
+               f"sin_{freq}_{i}": np.sin(i * k),
+               f"cos_{freq}_{i}": np.cos(i * k),
+           })
+       return pd.DataFrame(features, index=index)
+   ```
+
+2. `statsmodels` 라이브러리 이용하기
+
+   ```python
+   from statsmodels.tsa.deterministic import CalendarFourier, DeterministicProcess
+   
+   fourier = CalendarFourier(freq="A", order=10)  # 10 sin/cos pairs for "A"nnual seasonality
+   
+   dp = DeterministicProcess(
+       index=tunnel.index,
+       constant=True,               # dummy feature for bias (y-intercept)
+       order=1,                     # trend (order 1 means linear)
+       seasonal=True,               # weekly seasonality (indicators)
+       additional_terms=[fourier],  # annual seasonality (fourier)
+       drop=True,                   # drop terms to avoid collinearity
+   )
+   
+   X = dp.in_sample()  # create features for dates in tunnel.index
+   ```
+
+   |            | const | trend | s(2,7) | s(3,7) | s(4,7) | s(5,7) | s(6,7) | s(7,7) | sin(1,freq=M) | cos(1,freq=M) | sin(2,freq=M) | cos(2,freq=M) | sin(3,freq=M) | cos(3,freq=M) | sin(4,freq=M) | cos(4,freq=M) |
+   | ---------: | ----: | ----: | -----: | -----: | -----: | -----: | -----: | -----: | ------------: | ------------: | ------------: | ------------: | ------------: | ------------: | ------------: | ------------: |
+   |       date |       |       |        |        |        |        |        |        |               |               |               |               |               |               |               |               |
+   | 2017-01-01 |   1.0 |   1.0 |    0.0 |    0.0 |    0.0 |    0.0 |    0.0 |    0.0 |      0.000000 |      1.000000 |      0.000000 |      1.000000 |      0.000000 |      1.000000 |      0.000000 |      1.000000 |
+   | 2017-01-02 |   1.0 |   2.0 |    1.0 |    0.0 |    0.0 |    0.0 |    0.0 |    0.0 |      0.201299 |      0.979530 |      0.394356 |      0.918958 |      0.571268 |      0.820763 |      0.724793 |      0.688967 |
+   | 2017-01-03 |   1.0 |   3.0 |    0.0 |    1.0 |    0.0 |    0.0 |    0.0 |    0.0 |      0.394356 |      0.918958 |      0.724793 |      0.688967 |      0.937752 |      0.347305 |      0.998717 |     -0.050649 |
+   | 2017-01-04 |   1.0 |   4.0 |    0.0 |    0.0 |    1.0 |    0.0 |    0.0 |    0.0 |      0.571268 |      0.820763 |      0.937752 |      0.347305 |      0.968077 |     -0.250653 |      0.651372 |     -0.758758 |
+   | 2017-01-05 |   1.0 |   5.0 |    0.0 |    0.0 |    0.0 |    1.0 |    0.0 |    0.0 |      0.724793 |      0.688967 |      0.998717 |     -0.050649 |      0.651372 |     -0.758758 |     -0.101168 |     -0.994869 |
+
