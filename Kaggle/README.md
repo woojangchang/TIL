@@ -1010,3 +1010,151 @@ def plot_periodogram(ts, detrend='linear', ax=None):
    | 2017-01-04 |   1.0 |   4.0 |    0.0 |    0.0 |    1.0 |    0.0 |    0.0 |    0.0 |      0.571268 |      0.820763 |      0.937752 |      0.347305 |      0.968077 |     -0.250653 |      0.651372 |     -0.758758 |
    | 2017-01-05 |   1.0 |   5.0 |    0.0 |    0.0 |    0.0 |    1.0 |    0.0 |    0.0 |      0.724793 |      0.688967 |      0.998717 |     -0.050649 |      0.651372 |     -0.758758 |     -0.101168 |     -0.994869 |
 
+
+
+## Cycle
+
+**Cycle** : 계절성과는 별개로 고정된 빈도가 아닌 형태로 증가나 감소하는 것
+
+- 계절성은 매년 1~2월에 최저기온을 찍는다는 패턴이라면 주기성은 한 번씩 변동이 있으나 그 주기가 일정치 않을 때(19년 1월> 20년 2월 > 20년 12월 등)
+
+**Autocorrelation(자기상관)** : 시계열 데이터에서 과거의 값과 현재의 값이 밀접한 연관을 가질 때를 일컫는다.
+
+**Correlogram** : 자기상관을 그래프로 나타낸 것
+
+![img](https://i.imgur.com/6nTe94E.png)
+
+파란색 범위는 상관관계가 없다고 가정했을 때 95% 신뢰 구간
+
+
+
+## Hybrid Models
+
+```python
+series = trend + seasons + cycles + error
+```
+
+![img](https://i.imgur.com/XGJuheO.png)
+
+
+
+
+
+**모델 설계 시 주의점** : **Feature-transforming algorithm**인지 **target-transforming algorithm**인지에 따라 결과가 달라지므로 주의해야한다.
+
+- Feature-transforming algorithm : feature를 변화시켜 target을 찾는 알고리즘으로 회귀나 신경망 등이 있다.
+- Target-transforming algorithm : target에 맞춰 훈련 세트를 그룹화하는 알고리즘으로 랜덤 포레스트나 그레디언트 부스팅 등이 있다.
+- 이 때, target-transforming 알고리즘은 target이 한정되어 있기 때문에 훈련 세트의 범위를 넘어서지 못한다는 단점이 있다.
+- 의사결정나무로 예측한 CO2 량은 일정 범위를 넘어서지 못한다.
+
+![img](https://i.imgur.com/ZZtfuFJ.png)
+
+- 결론 : 선형 회귀로 트렌드를 찾고 제거한 뒤 XGBoost 등의 알고리즘을 사용, 또는 어느 하나의 알고리즘 결과를 새로운 feature로 하여 신경망 등으로 학습(**boosted** hybrids 또는 **stacked** hybrids라고 불림)
+- 참고 : Linear Regressor는 복수의 output을 예측하도록 학습할 수 있으나 XGBoost는 그렇지 않기 때문에 stack을 하여 하나의 column으로 만든 뒤 학습하여야 함.
+
+
+
+Kaggle Hybrid Model 예제
+
+- `X_1` : Linear Regression을 위한 feature(Trend+Seasonality)
+- `X_2` : XGBoost를 위한 feature
+
+```python
+class BoostedHybrid:
+    def __init__(self, model_1, model_2):
+        self.model_1 = model_1
+        self.model_2 = model_2
+        self.y_columns = None  # store column names from fit method
+        
+def fit(self, X_1, X_2, y):
+    self.model_1.fit(X_1, y)
+
+    y_fit = pd.DataFrame(
+        # make predictions with self.model_1
+        self.model_1.predict(X_1),
+        index=X_1.index, columns=y.columns,
+    )
+
+    # compute residuals
+    y_resid = y - y_fit
+    y_resid = y_resid.stack().squeeze() # wide to long
+
+    # fit self.model_2 on residuals
+    self.model_2.fit(X_2, y_resid)
+
+    # Save column names for predict method
+    self.y_columns = y.columns
+    
+# Add method to class
+BoostedHybrid.fit = fit
+
+def predict(self, X_1, X_2):
+    y_pred = pd.DataFrame(
+        # predict with self.model_1
+        self.model_1.predict(X_1),
+        index=X_1.index, columns=self.y_columns,
+    )
+    y_pred = y_pred.stack().squeeze()  # wide to long
+
+    # add self.model_2 predictions to y_pred
+    y_pred += self.model_2.predict(X_2)
+    
+    return y_pred.unstack()  # long to wide
+
+# Add method to class
+BoostedHybrid.predict = predict
+```
+
+```python
+# Target series
+y = family_sales.loc[:, 'sales']
+
+
+# X_1: Features for Linear Regression
+dp = DeterministicProcess(index=y.index, order=1)
+X_1 = dp.in_sample()
+
+
+# X_2: Features for XGBoost
+X_2 = family_sales.drop('sales', axis=1).stack()  # onpromotion feature
+
+# Label encoding for 'family'
+le = LabelEncoder()  # from sklearn.preprocessing
+X_2 = X_2.reset_index('family')
+X_2['family'] = le.fit_transform(X_2['family'])
+
+# Label encoding for seasonality
+X_2["day"] = X_2.index.day  # values are day of the month
+```
+
+
+
+## Forecasting With Machine Learning
+
+### Multistep Forecasting Strategies
+
+미래의 어느 특정 일이 아닌 특정 구간의 값을 예측하려고 할 때
+
+1. **Multioutput model** : 선형 회귀나 신경망 등의 여러 output을 내주는 알고리즘을 사용하기
+
+   ![img](https://i.imgur.com/uFsHiqr.png)
+
+   - 장단점 : 간단하고 효율적이나 XGBoost 등의 알고리즘을 사용할 수 없음
+
+2. **Direct strategy** : 구간 각각마다 다른 모델을 세워서 예측하기
+
+   ![img](https://i.imgur.com/HkolNMV.png)
+
+   - 단점 : 많은 모델을 학습해야하기 때문에 계산 비용이 비싸다.
+
+3. **Recursive strategy** : single one-step 모델을 학습한 뒤 다음 값을 예측하고, 예측한 값을 새로운 feature로 넣어 그 다음 값을 예측하기를 반복
+
+   ![img](https://i.imgur.com/sqkSFDn.png)
+
+   - 장단점 : 하나의 모델로도 만들 수 있으나 단계가 계속될수록 오류(error)가 전파(propagate)되기 때문에 먼 미래에 대한 예측이 부정확할 수 있다.
+
+4. **DirRec strategy** : direct와 recursive를 합친 방법으로, 각 단계에 대한 모델을 학습하고 그에 대한 예측값을 다음 단계에서 *새로운* lag feature로 사용
+
+   ![img](https://i.imgur.com/B7KAvAO.png)
+
+   - 장단점 : Direct보다 serial dependence를 더 잘 파악하지만 recursive처럼 여전히 오류가 전파된다.
