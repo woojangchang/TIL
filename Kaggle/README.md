@@ -1158,3 +1158,172 @@ X_2["day"] = X_2.index.day  # values are day of the month
    ![img](https://i.imgur.com/B7KAvAO.png)
 
    - 장단점 : Direct보다 serial dependence를 더 잘 파악하지만 recursive처럼 여전히 오류가 전파된다.
+
+
+
+
+
+# Data Cleaning
+
+## Handling Missing Values
+
+결측치가 "왜" 나왔는지를 파악하기 위해서는 분석하려는 대상의 분야에 대하여 잘 알아야하는 것이 우선이며 다음과 같은 질문을 던질 수 있다.
+
+> **결측치가 발생한 이유가 기록하지 않아서 그런 건지 존재하지 않는 값이라서 그런 건지?**
+
+- 후자의 경우 `NaN`으로 두어야하며 전자의 경우는 **imputation**을 통해 값을 채워야 한다.
+
+1. **Drop missing values** : 시간이 부족하거나 결측치의 원인을 파악할 수 없을 때 사용하는 방법. 그러나 유용한 정보를 잃을 가능성이 높다.
+
+   ```python
+   df.dropna() # row 기준
+   
+   df.dropna(axis=1) # column 기준
+   ```
+
+2. **Filling in missing values automatically**
+
+   ```python
+   df.fillna(0) # 0으로 채움
+   
+   df.fillna(method='bfill', axis=0).fillna(0) # 다다음 row의 값으로 채움 # 이전 row 값은 ffill
+   ```
+
+
+
+## Scaling and Normalization
+
+**Scaling** : 0-100 또는 0-1 등 특정 스케일로 변환하는 작업. SVM이나 KNN 등 알고리즘을 사용하기 위하여 사전 작업을 할 때 사용.
+
+```python
+from mlxtend.preprocessing import minmax_scaling
+
+scaled_data = minmax_scaling(original_data, columns=[0]) # columns=컬럼 명 또는 indices
+# min_val, max_val로 범위 지정 가능
+```
+
+![img](https://www.kaggleusercontent.com/kf/79128079/eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..wMiReRSRMMG6Q2L83kJNAA.bcKUVRxhCost1mCV2QUBMqdRSi6o-aH6m7d_nd28d5waKFeuL4yx4Ms9ftE1fMNO7358eL-wE5fhLggc8SXSUMDQPKnd95qk_A-wUGqeZFtSi9mqUCW2Zv3aqgee1xEOQB9XIJXFfVH9Pbl1Yao5ou62VuUZPJGOFhiB_vRU1rOqqIQBiCSbRDUVFzaKcEx0tjD0pHWsQoPhCJF9T0EkYb9UrTsWcE0r_dMYKKtPnSc9nqF_HEqbCgbqaVsVlHzsVFnCHZpuEvrH4rUOVyesbHWRY_R7LuCNt1iKUjUhCHxqOJ-ABCRzL1vE3WeFWUOJRukyJ-ch_zbTm2xwNvGrikqkkYso032kz6pJ2N0ETUED9SNPZBdq1uzp18l7hZsqB8y2ggjP6D3gP0SxSlACPvlMM--su2N6ehSATMSYMvEPC9_aS9JfyGdzBjBShAnmWfHezV8tQmPLVlxKWuDqgEoIWsJ0BzFK7To2GO5KAbXAL_Y4SghM4oWTNpCpuKZaCCfRWSRRrxoQ2-y8wzae8BsKFxzoecgK-8MxC_A99CHegDap7oqrF5n_ji7fuIZiXqNv3VrfpK48OWe35qrXODgAyvy4XcIBXe9Ri5msii9Ce4romSify9sIA_Xt3WSlF8R0oSdqtUJUQGPS8KEq7N3Yi1anNG_dlgdslpjGLgs.rxQ2SOVp_yoRQWqxGOjuGw/__results___files/__results___4_2.png)
+
+
+
+**Normalization** : 일반적으로 데이터가 정규 분포를 따른다고 가정하는 머신 러닝이나 통계 기법을 사용할 때 전처리 작업 용도로 사용. LDA(linear discriminanat analysis)나 Gaussian naive Bayes 등이 있음.
+
+```python
+from scipy import stats
+
+normalized_data = stats.boxcox(original_data) # original_data의 모든 값이 0보다 커야함
+```
+
+![img](https://www.kaggleusercontent.com/kf/79128079/eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..wMiReRSRMMG6Q2L83kJNAA.bcKUVRxhCost1mCV2QUBMqdRSi6o-aH6m7d_nd28d5waKFeuL4yx4Ms9ftE1fMNO7358eL-wE5fhLggc8SXSUMDQPKnd95qk_A-wUGqeZFtSi9mqUCW2Zv3aqgee1xEOQB9XIJXFfVH9Pbl1Yao5ou62VuUZPJGOFhiB_vRU1rOqqIQBiCSbRDUVFzaKcEx0tjD0pHWsQoPhCJF9T0EkYb9UrTsWcE0r_dMYKKtPnSc9nqF_HEqbCgbqaVsVlHzsVFnCHZpuEvrH4rUOVyesbHWRY_R7LuCNt1iKUjUhCHxqOJ-ABCRzL1vE3WeFWUOJRukyJ-ch_zbTm2xwNvGrikqkkYso032kz6pJ2N0ETUED9SNPZBdq1uzp18l7hZsqB8y2ggjP6D3gP0SxSlACPvlMM--su2N6ehSATMSYMvEPC9_aS9JfyGdzBjBShAnmWfHezV8tQmPLVlxKWuDqgEoIWsJ0BzFK7To2GO5KAbXAL_Y4SghM4oWTNpCpuKZaCCfRWSRRrxoQ2-y8wzae8BsKFxzoecgK-8MxC_A99CHegDap7oqrF5n_ji7fuIZiXqNv3VrfpK48OWe35qrXODgAyvy4XcIBXe9Ri5msii9Ce4romSify9sIA_Xt3WSlF8R0oSdqtUJUQGPS8KEq7N3Yi1anNG_dlgdslpjGLgs.rxQ2SOVp_yoRQWqxGOjuGw/__results___files/__results___6_2.png)
+
+
+
+## Parsing Dates
+
+**`datetime`으로 date column을 변경하기**
+
+```python
+import pandas as pd
+
+pd.to_datetime(df['date'], format="%m/%d/%y")
+```
+
+- 1/17/07의 format은 "%m/%d/%Y"
+- 17-1-2007의 format은 "%d-%m-%Y"
+- `infer_datetime_format=True` 옵션으로 자동으로 포맷을 찾을 수 있을 수도 있으나 1. 항상 제대로 된 포맷을 찾을 수 있다고 보장할 수 없으며 2. 속도가 느리다.
+
+
+
+## Character Encodings
+
+어떤 것으로 인코딩되었는지 확인하는 방법
+
+```python
+import chardet
+
+# look at the first ten thousand bytes to guess the character encoding
+with open("filename.csv", 'rb') as rawdata:
+    result = chardet.detect(rawdata.read(10000))
+
+# check what the character encoding might be
+print(result)
+```
+
+```
+{'encoding': 'Windows-1252', 'confidence': 0.73, 'language': ''}
+```
+
+때로는 10000 줄만 읽어서 안 되므로 더 큰 값을 넣어 확인할 필요도 있다.
+
+
+
+## Inconsistent Data Entry
+
+데이터에 일관성이 없는 경우에 데이터를 처리하는 방법
+
+- 아래 예시에서 같은 독일이라도 ' Germany', 'Germany', germany'의 세 종류가 있고 한국도 'South Korea'와 'SouthKorea' 두 종류가 있다.
+
+```python
+countries = professors['Country'].unique()
+
+countries.sort()
+countries
+```
+
+```
+array([' Germany', ' New Zealand', ' Sweden', ' USA', 'Australia',
+       'Austria', 'Canada', 'China', 'Finland', 'France', 'Greece',
+       'HongKong', 'Ireland', 'Italy', 'Japan', 'Macau', 'Malaysia',
+       'Mauritius', 'Netherland', 'New Zealand', 'Norway', 'Pakistan',
+       'Portugal', 'Russian Federation', 'Saudi Arabia', 'Scotland',
+       'Singapore', 'South Korea', 'SouthKorea', 'Spain', 'Sweden',
+       'Thailand', 'Turkey', 'UK', 'USA', 'USofA', 'Urbana', 'germany'],
+      dtype=object)
+```
+
+1. 직접 수정
+
+```python
+# convert to lower case
+professors['Country'] = professors['Country'].str.lower()
+# remove trailing white spaces
+professors['Country'] = professors['Country'].str.strip()
+```
+
+```
+array(['australia', 'austria', 'canada', 'china', 'finland', 'france',
+       'germany', 'greece', 'hongkong', 'ireland', 'italy', 'japan',
+       'macau', 'malaysia', 'mauritius', 'netherland', 'new zealand',
+       'norway', 'pakistan', 'portugal', 'russian federation',
+       'saudi arabia', 'scotland', 'singapore', 'south korea',
+       'southkorea', 'spain', 'sweden', 'thailand', 'turkey', 'uk',
+       'urbana', 'usa', 'usofa'], dtype=object)
+```
+
+
+
+2. `fuzzywuzzy` 패키지를 사용하여 유사한 단어를 하나로 합치기
+
+```python
+import fuzzywuzzy
+from fuzzywuzzy import process
+
+# get the top 10 closest matches to "south korea"
+matches = fuzzywuzzy.process.extract("south korea", countries, limit=10, scorer=fuzzywuzzy.fuzz.token_sort_ratio)
+
+matches
+```
+
+```
+[('south korea', 100),
+ ('southkorea', 48),
+ ('saudi arabia', 43),
+ ('norway', 35),
+ ('austria', 33),
+ ('ireland', 33),
+ ('pakistan', 32),
+ ('portugal', 32),
+ ('scotland', 32),
+ ('australia', 30)]
+```
+
