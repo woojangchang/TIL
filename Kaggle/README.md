@@ -38,11 +38,11 @@ https://www.kaggle.com/alexisbcook/data-leakage
 
 
 
+# Visualization
 
+## Scatter Plots
 
-# Scatter Plots
-
-## scatterplot
+### scatterplot
 
 산점도를 확인할 때 사용
 
@@ -64,7 +64,7 @@ sns.scatterplot(data=candy_data, x='pricepercent', y='winpercent', hue='chocolat
 
 
 
-## regplot
+### regplot
 
 산점도에 회귀직선까지 함께 나타내고 싶을 때 사용
 
@@ -76,7 +76,7 @@ sns.regplot(data=candy_data, x='sugarpercent', y='winpercent')
 
 
 
-## lmplot
+### lmplot
 
 산점도에 회귀직선을 카테고리별로 따로 나타내고 싶을 때 사용
 
@@ -88,7 +88,7 @@ sns.lmplot(data=candy_data, x='pricepercent', y='winpercent', hue='chocolate')
 
 
 
-## swarmplot
+### swarmplot
 
 카테고리 변수마다 수치형 변수가 어떻게 모여있는지 (분포를) 확인하려고 할 때 사용
 
@@ -102,9 +102,9 @@ sns.swarmplot(data=candy_data, x='chocolate', y='winpercent')
 
 
 
-# Distributions
+## Distributions
 
-## distplot
+### distplot
 
 값의 분포를 알아보기 위할 때 사용
 
@@ -116,7 +116,7 @@ sns.distplot(a=iris_data['Petal Length (cm)'], kde=False)
 
 
 
-## kdeplot
+### kdeplot
 
 **kernel density estimate (KDE)**, 값의 분포를 부드러운 곡선으로 나타내기 위할 때 사용
 
@@ -130,7 +130,7 @@ sns.kdeplot(data=iris_data['Petal Length (cm)'], shade=True)
 
 
 
-## jointplot
+### jointplot
 
 2개의 분포를 겹쳐 등고선을 그리고자 할 때 사용
 
@@ -144,7 +144,7 @@ sns.jointplot(x=iris_data['Petal Length (cm)'], y=iris_data['Sepal Width (cm)'],
 
 
 
-# Custom Styles
+## Custom Styles
 
 ```python
 sns.set_style("dark")
@@ -1327,3 +1327,173 @@ matches
  ('australia', 30)]
 ```
 
+
+
+
+
+# AI Ethics
+
+## Human-Centered Design for AI
+
+접근법
+
+1. 문제를 정의하기 위한 요구 사항 이해
+   - 주변 사람 인터뷰 등을 통한 배경 지식 이해가 필요한 작업
+2. AI가 잠재 해결법에 가치를 더해주는지 확인
+   - 달성하려고 하는 것이 좋은 결과물을 낸다고 받아들여지는가?
+   - 규칙 기반 해결책처럼 AI 시스템이 아닌 방법보다 AI 시스템이 더 효율적인가?
+   - AI를 사용하는 일이 지루하고 반복적이거나 집중하기 어려운 일인가?
+   - 과거의 비슷한 경험들로부터 AI 해결책이 다른 방법들보다 더 낫다는 것이 증명되어왔는가?
+3. AI 시스템이 유발할 부작용을 고려하기
+   - 데이터를 다루는 중 개인 정보 보호가 이루어져야함
+   - 에세이를 자동으로 평가하는 AI의 경우, 특정 언어에 편중되거나 AI에 맞춰서 내려는 사람들을 조심해야 하는 등
+4. AI가 아닌 해결책으로 프로토타입을 시작하기
+   - 사람들과 어떻게 상호작용하는지 프로토타입을 통해 관찰, 발전
+   - 영화 추천 시스템이라면 다양한 사람들을 모아 직접 추천하는 시스템 프로토타입을 만든 뒤 그걸 기반으로 모델을 발전시키는 등
+5. 사람들이 시스템에 도전할 수 있는 방법을 제공(피드백)
+   - 어떤 방법으로 추천했는지 설명을 요청
+   - 입력하는 정보를 바꿔서 요청
+   - 특정 feature를 제거
+   - 소셜 미디어를 통해 제품팀과 대화
+6. 안전 대책 마련
+   - 의도하지 않은 행동을 하는 유저에 대한 감시를 할 수 있는 팀을 만드는 등의 대책이 필요
+
+
+
+## Identifying Bias in AI
+
+**Historical bias** : 편향된 데이터(세계의 현 상태)로 학습하여 편향된 모델이 만들어지는 것. 챗봇을 만들 때 욕설이 섞인 데이터로 학습하면 욕설을 뱉는 챗봇이 만들어지는 문제, 높은 직위에 많은 남성이 있다는 이유로 남성만 채용하는 AI 문제 등
+
+**Representation bias** : 균등하지 못한 데이터로 학습하여 편향된 모델이 만들어지는 것. 얼굴 인식 모델을 만들 때 백인 얼굴 데이터로 학습하여 흑인 얼굴이 인식이 되지 않는 문제, 휴대 전화 데이터를 수집할 때 노인층의 데이터가 적어 대표성에 문제가 생기는 등
+
+**Measurement bias** : 그룹 간 정확도의 차이를 보일 때 나타나는 것
+
+**Aggregation bias** : 특정 그룹에는 성능이 좋으나 나머지에는 좋지 않을 때
+
+**Evaluation bias** : 모델을 평가할 때 벤츠마크 데이터가 모델이 사용할 모집단을 나타내지 않는 경우
+
+**Deployment bias** : 의도한 바와 다르게 모델이 사용되는 문제
+
+
+
+## AI Fairness
+
+다양한 기준이 있지만 4가지만 소개(대출 허용/대학 입학 등의 상황을 가정)
+
+1. **Demographic parity / statistical parity** : 데이터와 같은 구성비로 사람을 선발하는 모델. 남:여가 6:4인 지원자 데이터에서 6:4로 사람을 선발하는 등
+
+![img](https://i.imgur.com/e32gcDh.png)
+
+20명의 지원자 중 50%가 A그룹이므로 승인된 50%도 A그룹 지원자
+
+
+
+2. **Equal oppotunity** : 구성비와 관계 없이 동일한 비율(TPR/민감도)로 선발하는 모델
+
+![img](https://i.imgur.com/aInWboA.png)
+
+A와 B 모두 같은 TPR을 가짐
+
+
+
+3. **Equal accuracy** : 구성비와 관계 없이 동일한 정확도를 가지는 모델
+
+![img](https://i.imgur.com/fIOJovc.png)
+
+A와 B 모두 같은 정확도를 가짐
+
+
+
+4. **Group unaware / "Fairness through unawareness"** : 성별, 나이, 인종 등 그룹을 특정지을 수 있는 데이터를 제거하고 학습한 모델. 특정 인종이 모여사는 주소지도 제거해야할 대상이 될 수 있다.
+
+```python
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
+
+# Function to plot confusion matrix
+def plot_confusion_matrix(estimator, X, y_true, y_pred, display_labels=["Deny", "Approve"],
+                          include_values=True, xticks_rotation='horizontal', values_format='',
+                          normalize=None, cmap=plt.cm.Blues):
+    cm = confusion_matrix(y_true, y_pred, normalize=normalize)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=display_labels)
+    return cm, disp.plot(include_values=include_values, cmap=cmap, xticks_rotation=xticks_rotation,
+                     values_format=values_format)
+
+# Function to evaluate the fairness of the model
+def get_stats(X, y, model, group_one, preds):
+        
+    y_zero, preds_zero, X_zero = y[group_one==False], preds[group_one==False], X[group_one==False]
+    y_one, preds_one, X_one = y[group_one], preds[group_one], X[group_one]
+    
+    print("Total approvals:", preds.sum())
+    print("Group A:", preds_zero.sum(), "({}% of approvals)".format(round(preds_zero.sum()/sum(preds)*100, 2)))
+    print("Group B:", preds_one.sum(), "({}% of approvals)".format(round(preds_one.sum()/sum(preds)*100, 2)))
+    
+    print("\nOverall accuracy: {}%".format(round((preds==y).sum()/len(y)*100, 2)))
+    print("Group A: {}%".format(round((preds_zero==y_zero).sum()/len(y_zero)*100, 2)))
+    print("Group B: {}%".format(round((preds_one==y_one).sum()/len(y_one)*100, 2)))
+    
+    cm_zero, disp_zero = plot_confusion_matrix(model, X_zero, y_zero, preds_zero)
+    disp_zero.ax_.set_title("Group A")
+    cm_one, disp_one = plot_confusion_matrix(model, X_one, y_one, preds_one)
+    disp_one.ax_.set_title("Group B")
+    
+    print("\nSensitivity / True positive rate:")
+    print("Group A: {}%".format(round(cm_zero[1,1] / cm_zero[1].sum()*100, 2)))
+    print("Group B: {}%".format(round(cm_one[1,1] / cm_one[1].sum()*100, 2)))
+    
+# Evaluate the model    
+get_stats(X_test, y_test, model_baseline, X_test["Group"]==1, preds_baseline)
+```
+
+그룹마다 허용치(threshold)를 다르게 두어 parity를 조절할 수 있다. A 그룹은 0.11만 넘어도 허용, B 그룹은 0.99를 넘지 못하면 불허 등
+
+```python
+# Change the value of zero_threshold to hit the objective
+zero_threshold = 0.11
+one_threshold = 0.99
+
+# Evaluate the model
+test_probs = model_unaware.predict_proba(X_test_unaware)[:,1]
+preds_approval = (((test_probs>zero_threshold)*1)*[X_test["Group"]==0] + ((test_probs>one_threshold)*1)*[X_test["Group"]==1])[0]
+get_stats(X_test, y_test, model_unaware, X_test["Group"]==1, preds_approval)
+```
+
+
+
+## Model Cards
+
+**Model Card** : 머신 러닝 모델에 대한 중요한 정보를 담은 짧은 문서로써 청중들에게 투명성을 제공하는 역할을 한다.
+
+예시 : [Open AI’s model card for GPT-3](https://github.com/openai/gpt-3/blob/master/model-card.md), [Model Card - Smiling Detection in Images](https://github.com/Kaggle/learntools/blob/master/notebooks/ethics/pdfs/smiling_in_images_model_card.pdf), [Model Card - Toxicity in Text](https://github.com/Kaggle/learntools/blob/master/notebooks/ethics/pdfs/toxicity_in_text_model_card.pdf)
+
+청중은 모델의 역할에 따라 달라질 수 있으며 많이 읽을 층을 타겟으로 쓰는 것이 좋다. 누구나 쉽게 이해할 수 있는 수준과 기술적인 정보 사이에 균형이 잘 맞아야 한다.
+
+**포함해야 할 내용** : 더 추가하거나 뺄 수도 있다.
+
+1. **Model Details**
+   - 개발자, 모델 버전 등의 배경 정보
+2. **Intended Use**
+   - 범위 안 사용 사례
+   - 예상되는 유저층
+   - 범위 밖 사용 사례
+3. **Factors**
+   - 모델의 성능에 영향을 미치는 요인
+   - 웃는 모습을 찾는다면 나이, 성별 등 인구통계적 요소나 밝은 곳이나 어두운 곳, 카메라 특성 등의 환경적 요소 등
+4. **Metrics**
+   - 모델의 성능을 측정하기 위하여 어떤 메트릭을 썼는가? 그리고 왜 그것을 골랐는가?
+     - **분류 문제**의 잠재 에러 타입에는 FPR(False Positive Rate), FNR(False Negative Rate), FDR(False Discovery Rate) 그리고 FOR(False Omission Rate)이 있으며 사용 사례에 따라 각각의 중요성이 달라짐
+     - **회귀 문제**는 그룹에 걸쳐 모델 성능을 평가
+5. **Evaluation Data**
+   - 모델을 평가하는 데 어떤 데이터셋을 사용했는지, 가능하다면 데이터셋을 제공
+   - 모델을 평가하는 데 왜 그 데이터셋을 사용했는지
+   - 데이터셋이 일반적인 사용 사례, 예상 테스트 사례 및/또는 도전적 사례를 대표하는지
+6. **Training Data**
+   - 모델 학습에 어떤 데이터를 사용했는지
+7. **Quantitative Analyses**
+   - 선택한 메트릭에서 어떤 성능이 나왔는지
+   - 중요한 요소나 요소 간 상호작용에 의해 어떻게 성능이 바뀌는지(그룹마다 성능의 차이가 어떤지)
+8. **Ethical Considerations**
+   - 모델을 학습하기 위한 민감 데이터, 인간의 삶, 건강, 안전 등에 영향을 주는지, 그 위험성을 줄일 방법, 어떤 위험성이 있을지 등 윤리적으로 고려해야할 사항을 알려줘야 함
+9. **Caveats and Recommendations**
+   - 위 사항들 외에 언급해야할 것들
