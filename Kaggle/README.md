@@ -1497,3 +1497,373 @@ get_stats(X_test, y_test, model_unaware, X_test["Group"]==1, preds_approval)
    - 모델을 학습하기 위한 민감 데이터, 인간의 삶, 건강, 안전 등에 영향을 주는지, 그 위험성을 줄일 방법, 어떤 위험성이 있을지 등 윤리적으로 고려해야할 사항을 알려줘야 함
 9. **Caveats and Recommendations**
    - 위 사항들 외에 언급해야할 것들
+
+
+
+
+
+# Geospatial Analysis
+
+## Reading and ploting data
+
+[shapefile](https://en.wikipedia.org/wiki/Shapefile), [GeoJSON](https://en.wikipedia.org/wiki/GeoJSON), [KML](https://en.wikipedia.org/wiki/Keyhole_Markup_Language), [GPKG](https://en.wikipedia.org/wiki/GeoPackage) 등 다양한 파일 포맷이 있으나 `geopandas` 라이브러리의 `read_file()` 함수를 사용하면 모두 불러올 수 있다.
+
+```python
+import geopandas as gpd
+
+full_data = gpd.read_file('filename.shp')
+```
+
+`geometry` column에는 크게 `Point`, `LineString`, `Polygon` class가 있다.
+
+![img](https://i.imgur.com/N1llefr.png)
+
+가장 간단하게 그래프를 그리는 방법은 `plot()` 메서드를 이용하는 것이다.
+
+```python
+# Define a base map with county boundaries
+ax = counties.plot(figsize=(10,10), color='none', edgecolor='gainsboro', zorder=3)
+
+# Add wild lands, campsites, and foot trails to the base map
+wild_lands.plot(color='lightgreen', ax=ax)
+campsites.plot(color='maroon', markersize=2, ax=ax)
+trails.plot(color='black', markersize=1, ax=ax)
+```
+
+![img](https://www.kaggleusercontent.com/kf/79128018/eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..NyXIikJq4xBfjza4ChOXww.0snfNQMmIfFjO0ySHvK_3qmaOBIdRKLs5HalAs2K9TlFGkYM0ZL2c4bmKfjaQkpUADhDwxvZ_Qlt9Lza6iwYLq6lr-Nmpy70eANcTLa1OTkEDQePRSKqqCbUciQWjGlsUHqqEJMzA1bPzyVNEMoUaN5H_MvPWl5uqoA3B04efsbx1ckuylF5bgaAcM125rQlqJQF_Rd0s_ulMbKb2NeAq4IIVPPktEkac-tJ10Ng32pm-mq8uaqU7KVTqCVP3HdX6MblAxSeo49GxFuVsP5ViB3a0lGiF0DM5p5xNgEnqEftkAvWu3ykNoKb8fSaDl595mZmwoBRZVwHqMDEst6dqLHL2oDGg5ir3QAm2IuLXM52b0oyyaWTlxggrwnJnSlX_8p1wl6lJFsspaQ95KDtNJGf1kzN3QB3gFZ1C26d9GAljHov2AWsFZXtBhGc0Qkp7aeUSy8GDQrXg9sSo7Gil1B06Zxew7DslBvGsfNKTn0NEulAsNxbDJRuyFmFJMmmOFCcm5ttaI9jhQwP3T1UZFtKkN6rcaxjDwCs8dJayJ8VFPBZICsfwxWdcxHzD20BvOYdl5Cc1NuPbBwFzKfBIBS5XwmT_yeuxDCzg_pBp7FPySqykQVbUt6edZsVk-IIL_k4U_Mi5mOmmXIuZctXvpXHX6zDBvJp_Xa-Oi8gAdE.AboJXEgppAwam3jah6Ynsg/__results___files/__results___19_1.png)
+
+
+
+geopandas에서 세계 지도를 자체적으로 지원하므로 잘 이용하면 좋을 것 같다.
+
+```python
+world_filepath = gpd.datasets.get_path('naturalearth_lowres')
+world = gpd.read_file(world_filepath)
+
+ax = world.plot(figsize=(20,20), color='whitesmoke', linestyle=':', edgecolor='black')
+world_loans.plot(ax=ax, markersize=2)
+```
+
+![image-20211129105013817](README.assets/image-20211129105013817.png)
+
+
+
+## Coordinate Reference System
+
+구인 지구를 평면으로 바꾸는 좌표계에는 여러 가지가 있으며 이를 CRS라고 부르며 EPSG로 참조된다.
+
+geopandas가 아닌 pandas로 csv 파일을 불러올 때는 crs를 설정해줘야 하며 위도, 경도 좌표계는 EPSG 4326을 사용한다.
+
+```python
+# Create a DataFrame with health facilities in Ghana
+facilities_df = pd.read_csv("../input/geospatial-learn-course-data/ghana/ghana/health_facilities.csv")
+
+# Convert the DataFrame to a GeoDataFrame
+facilities = gpd.GeoDataFrame(facilities_df, geometry=gpd.points_from_xy(facilities_df.Longitude, facilities_df.Latitude))
+
+# Set the coordinate reference system (CRS) to EPSG 4326
+facilities.crs = {'init': 'epsg:4326'}
+```
+
+- pandas로 csv 파일을 읽어들인 뒤 `gpd.GeoDataFrame()`을 이용하여 GeoDataFrame으로 변환
+- `gpd.points_from_xy()` 함수는 경도와 위도를 받아 `Point`로 내뱉는다.
+
+
+
+여러 지리 파일들을 plot 할 때 좌표계가 같아야 한다. 이 때 좌표계를 바꾸기 위해 `.to_crs()` 메서드를 이용하며 epsg를 동일하게 맞춰주어야 한다.
+
+```python
+ax = regions.plot(figsize=(8,8), color='whitesmoke', linestyle=':', edgecolor='black')
+facilities.to_crs(epsg=32630).plot(markersize=1, ax=ax)
+```
+
+![img](https://www.kaggleusercontent.com/kf/79127978/eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..ajl6ZXZ9g4kPbhv0s3DV7A.rJQ2kAFHUxDAjGub8i3Z2vHH1mDdjebIYNCZi2pHAJ1SdsyZMLH1yh0V_Rc0DK0WgJTLFhwkWWKvys4RRbITDfq9Fr724TpRgDKdbyPQyWctocPs-wVoWKNxUH9MtBOnddAQpqNOgnksuji-zwDe39-28mqiDVYwKt0kdFAq2oZISRlRGs0t022zFVWcXstMvo_yMEE-t0dgC3BDg3itYZucf9yHjTj9c3uEMonOTLY7Nsxpjc06N62VpzmfwWMBNy1zJHVihzD2MY3RHxZVM4AaAn-6ufazRfpx4gGyhLAPUlvvGeiJBxh_Ef_mdnATtYhdrCHhE7AGjPi_98XI_EmtlDUW1Q28eG3iEj97e2w-bEiNI3X1Ywgb2_pQ6qcotTWLV5iJncrKQ-63FXOW5LT7hWVk6dGi3yeKw0a_J3mPOLjS792Ahw6f5-qo34xoY5P_4gAycJ0YLRehhLv-WUzBQPrHNc0ZbYFtC7r3CugLXe0T2A8511UWxg-a6acin3PUdXiCRGuwpLHJ5AAlSHX3ftJGTOwDEPMDs92dUEpEL9VI3nT0ICufsD_pTOICtx73sa8WFFNzq12YsdNofA5w7pz69ykKqW6S7bLUuUNiLWMqmu89a0x3mxIJ4MjwZeV4E5sigeJm0Tu7xMIdghCLBLUnjY48NYIUWP-rii8.UCjBSAbHqqo6rUbUyqM9Jg/__results___files/__results___8_1.png)
+
+
+
+`to_crs()` 메서드는 "geometry" column에만 적용된다. (latitude나 longitude 등의 column에는 적용되지 않는다.)
+
+
+
+EPSG 코드를 사용하여 변환이 이루어지지 않는 경우 CRS의 "proj4 string"으로 변환할 수 있다.
+
+```python
+# Change the CRS to EPSG 4326
+regions.to_crs("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs").head()
+```
+
+
+
+geometry column의 각 값이 Point인 경우 `x`, `y`를 가져올 수 있고 LineString은 `length`, Polygon은 `area`를 가져올 수 있다.
+
+LineString은 Point의 list를 받아 생성할 수 있다.
+
+```python
+# GeoDataFrame showing path for each bird
+path_df = birds.groupby("tag-local-identifier")['geometry'].apply(list).apply(lambda x: LineString(x)).reset_index()
+path_gdf = gpd.GeoDataFrame(path_df, geometry=path_df.geometry)
+path_gdf.crs = {'init' :'epsg:4326'}
+```
+
+
+
+## Interactive Maps
+
+**folium**으로 지도를 띄울 수 있다.
+
+```python
+import folium
+
+# Create a map
+m_1 = folium.Map(location=[lat, lon], tiles='openstreetmap', zoom_start=10)
+
+# Display the map
+m_1
+```
+
+- `location` : 지도의 중심
+- `tiles` : openstreetmap 외에 다양한 옵션이 있다. ([링크](https://github.com/python-visualization/folium/tree/main/folium/templates/tiles))
+- `zoom_start` : 확대 정도
+
+
+
+**Marker**로 지점을 표시할 수 있다.
+
+```python
+from folium import Marker
+
+# Create a map
+m_2 = folium.Map(location=[42.32,-71.0589], tiles='cartodbpositron', zoom_start=13)
+
+# Add points to the map
+for idx, row in daytime_robberies.iterrows():
+    Marker([row['Lat'], row['Long']]).add_to(m_2)
+
+# Display the map
+m_2
+```
+
+
+
+**MarkerCluster**로 Marker들을 한데 모아 개수로 표시해줄 수 있다.
+
+```python
+from folium.plugins import MarkerCluster
+
+# Create the map
+m_3 = folium.Map(location=[42.32,-71.0589], tiles='cartodbpositron', zoom_start=13)
+
+# Add points to the map
+mc = MarkerCluster()
+for idx, row in daytime_robberies.iterrows():
+    if not math.isnan(row['Long']) and not math.isnan(row['Lat']):
+        mc.add_child(Marker([row['Lat'], row['Long']]))
+m_3.add_child(mc)
+
+# Display the map
+m_3
+```
+
+
+
+**Circle**로 Marker 대신 원(또는 점)으로 나타낼 수 있다.
+
+```python
+from folium import Circle
+
+# Create a base map
+m_4 = folium.Map(location=[42.32,-71.0589], tiles='cartodbpositron', zoom_start=13)
+
+def color_producer(val):
+    if val <= 12:
+        return 'forestgreen'
+    else:
+        return 'darkred'
+
+# Add a bubble map to the base map
+for i in range(0,len(daytime_robberies)):
+    Circle(
+        location=[daytime_robberies.iloc[i]['Lat'], daytime_robberies.iloc[i]['Long']],
+        radius=20,
+        color=color_producer(daytime_robberies.iloc[i]['HOUR'])).add_to(m_4)
+
+# Display the map
+m_4
+```
+
+
+
+**HeatMap**으로 density(개수)를 지도에 표시할 수 있다.
+
+```python
+from folium.plugins import HeatMap
+
+# Create a base map
+m_5 = folium.Map(location=[42.32,-71.0589], tiles='cartodbpositron', zoom_start=12)
+
+# Add a heatmap to the base map
+HeatMap(data=crimes[['Lat', 'Long']], radius=10).add_to(m_5)
+
+# Display the map
+m_5
+```
+
+
+
+**Choropleth**로 각 구역(Polygon)을 색칠할 수 있다.
+
+```python
+from folium import Choropleth
+
+# GeoDataFrame with geographical boundaries of Boston police districts
+districts_full = gpd.read_file('../input/geospatial-learn-course-data/Police_Districts/Police_Districts/Police_Districts.shp')
+districts = districts_full[["DISTRICT", "geometry"]].set_index("DISTRICT")
+
+# Number of crimes in each police district
+plot_dict = crimes.DISTRICT.value_counts()
+
+# Create a base map
+m_6 = folium.Map(location=[42.32,-71.0589], tiles='cartodbpositron', zoom_start=12)
+
+# Add a choropleth map to the base map
+Choropleth(geo_data=districts.__geo_interface__, 
+           data=plot_dict, 
+           key_on="feature.id", 
+           fill_color='YlGnBu', 
+           legend_name='Major criminal incidents (Jan-Aug 2018)'
+          ).add_to(m_6)
+
+# Display the map
+m_6
+```
+
+- `geo_data`는 GeoJSON FeatureCollection 형태로 된 boundary를 필요로 하며, 위 코드에서는 `__geo_interface__` 속성으로 GeoDataFrame을 GeoJSON FeatureCollection으로 변환하였다.
+- `data`는 각 지역에 할당할 값
+- `key_on`은 geo_data와 data를 이어주는 column을 뜻하며, 위 코드에서는 index끼리 묶기 위하여 `feature.id`를 사용
+
+
+
+## Manipulating Geospatial Data
+
+**Geocoding**을 사용하기 위해 `geopy` 라이브러리를 이용, 랜드 마크 등 고유 명사나 주소를 string으로 입력하면 끝.
+
+```python
+from geopy.geocoders import Nomiatim
+
+geolocator = Nominatim(user_agent="kaggle_learn")
+location = geolocator.geocode("Pyramid of Khufu")
+
+print(location.point)
+print(location.address)
+
+"""
+29 58m 44.9758s N, 31 8m 3.17634s E
+هرم خوفو, شارع ابو الهول السياحي, نزلة البطران, الجيزة, محافظة الجيزة, 12556, مصر
+"""
+```
+
+
+
+```python
+point = location.point
+print("Latitude:", point.latitude)
+print("Longitude:", point.longitude)
+
+"""
+Latitude: 29.97915995
+Longitude: 31.134215650388754
+"""
+```
+
+
+
+이를 이용하여 null값을 채울 수 있다.
+
+```python
+# Create the geocoder
+geolocator = Nominatim(user_agent="kaggle_learn")
+
+def my_geocoder(row):
+    point = geolocator.geocode(row).point
+    return pd.Series({'Latitude':point.latitude, 'Longitude':point.longitude})
+
+berkeley_locations = rows_with_missing.apply(lambda x: my_geocoder(x['Address']), axis=1)
+starbucks.update(berkeley_locations)
+```
+
+- pandas의 update는 index와 column에 맞춰 값을 바꿔준다.
+
+
+
+**sjoin**을 이용하여 두 GeoDataFrame을 합칠 수 있다.
+
+```python
+european_universities = gpd.sjoin(universities, europe)
+```
+
+- `how` : 기본값은 `inner`
+- `op` : 결합할 방법으로 기본값은 `intersects`이며 `contains`와 `within`이 있다. `geometry` column이 서로 교차하는지, 어느 한 쪽이 다른 한 쪽을 포함하는지 등을 확인하여 결합한다.
+
+
+
+## Proximity Analysis
+
+한 지점과 다른 지점 사이의 거리 재기
+
+```python
+# Select one release incident in particular
+recent_release = releases.iloc[360]
+
+# Measure distance from release to each station
+distances = stations.geometry.distance(recent_release.geometry)
+```
+
+```python
+# 평균 거리
+distances.mean()
+
+# 최소 거리
+distances.min()
+stations.iloc[distances.idxmin()]
+```
+
+
+
+**buffer**를 이용하여 한 지점을 기준으로 원형 폴리곤 생성
+
+```python
+# crs가 feet 단위이고 1마일=5280피트이므로
+two_mile_buffer = stations.geometry.buffer(2*5280)
+```
+
+```python
+from folium import GeoJson
+
+# Plot each polygon on the map
+# 지도에 넣기 위해 위경도 좌표계로 변환하기
+GeoJson(two_mile_buffer.to_crs(epsg=4326)).add_to(m)
+```
+
+
+
+모든 Polygon을 하나로 합치기
+
+```python
+my_union = two_mile_buffer.geometry.unary_union
+```
+
+```python
+# 지점이 포함되는지 확인
+my_union.contains(releases.iloc[360].geometry)
+```
+
+
+
+원을 그려 범위 안에 들어오지 않는 좌표들을 가져오기
+
+```python
+coverage = gpd.GeoDataFrame(geometry=hospitals.geometry).buffer(10000) # m 단위이므로 10km
+my_union = coverage.geometry.unary_union
+outside_range = collisions.loc[~collisions["geometry"].apply(lambda x: my_union.contains(x))]
+```
+
