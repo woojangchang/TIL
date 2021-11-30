@@ -1867,3 +1867,244 @@ my_union = coverage.geometry.unary_union
 outside_range = collisions.loc[~collisions["geometry"].apply(lambda x: my_union.contains(x))]
 ```
 
+
+
+
+
+# Machine Learning Explinability
+
+## Use Cases for Model Insights
+
+- 모델이 데이터 속에서 어떤 특성을 가장 중요하다고 보았는가?
+- 모델의 단일 예측에서 각 특성은 예측 결과에 어떤 영향을 미치는가?
+- 큰 그림 관점에서 봤을 때 각 특성이 모델의 예측에 어떤 영향을 미치는가?
+
+위와 같은 인사이트를 통해 많은 용례를 얻을 수 있다.
+
+- **Dubugging**
+- **Informing Feature Engineering** : feature의 숫자가 많을수록 중요해진다.
+- **Directing Future Data Collection** : 모든 데이터를 수집하는 것이 아니므로, 인사이트를 통해 새로운 데이터를 수집하는 결정을 내릴 수 있다.
+- **Informing Human Decision-Making**
+- **Building Trust**
+
+
+
+## Permutation Importance
+
+특성의 중요도를 나타내는 개념을 **feature importance**라고 하며 그 중 **Permutation Importance**의 장점은
+
+- 계산이 빠르다
+- 널리 사용되며 이해된다
+- feature importance 척도가 가지는 속성과 일치한다.
+
+Permutation importance는 모델이 만들어진 뒤에 계산되며 아이디어는 "하나의 feature를 랜덤하게 섞었을 때 정확도 등의 지표가 어떻게 변할까?"이다. 진행 과정은 다음과 같다.
+
+1. 훈련된 모델을 가져온다.
+2. 하나의 열을 정해 랜덤으로 섞고 모델로 예측하여 원래의 손실 함수와 비교하여 얼마나 성능이 저하되었는지를 중요도 지표로 삼는다.
+3. 원래 데이터로 복구시킨 후 다른 열에 대하여 2번 과정을 반복한다.
+
+**eli5** 라이브러리를 이용하여 구할 수 있다.
+
+```python
+import eli5
+from eli5.sklearn import PermutationImportance
+
+perm = PermutationImportance(my_model, random_state=1).fit(val_X, val_y)
+eli5.show_weights(perm, feature_names = val_X.columns.tolist())
+```
+
+![image-20211130144449974](README.assets/image-20211130144449974.png)
+
+해석 방법
+
+- 위에 있을 수록 중요한 특성이다.
+- weight는 섞인 후에 모델의 성능이 얼마나 떨어졌는지를 알려주는 것이며(위 경우에는 정확도) ± 뒤의 숫자는 랜덤으로 섞었기 때문에 발생한 무작위성에 의해 어느 정도까지 바뀌는지 알려주는 것이다.
+- 값이 음수가 나오는 것은 작은 데이터셋에서 흔히 등장한다.
+
+
+
+## Partial Plots
+
+Feature importance가 어떤 변수가 예측에 가장 영향을 주는지를 보여준다면 partial dependence는 변수가 예측에 *어떻게* 영향을 주는지를 보여준다.
+
+Feature importance와 마찬가지로 모델이 훈련된 뒤에 계산되며 여러 행을 이용, 특정 열의 값이 변화할 때 어떻게 변화하는지를 그래프로 나타내준다.
+
+**pdpbox** 라이브러리를 이용하여 구할 수 있다.
+
+```python
+from matplotlib import pyplot as plt
+from pdpbox import pdp, get_dataset, info_plots
+
+# Create the data that we will plot
+pdp_goals = pdp.pdp_isolate(model=tree_model, dataset=val_X, model_features=feature_names, feature='Goal Scored')
+
+# plot it
+pdp.pdp_plot(pdp_goals, 'Goal Scored')
+plt.show()
+```
+
+![img](https://www.kaggleusercontent.com/kf/79126753/eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..Whbd7vVat8iY3io1R8qrPw.-icQF64mQPRGHCs0t88mXzSrs1luF3fHG9zgnY1AgmXRDxB6WE2rihuPxVLi5I5t7cNmezgBYKTpU9gg4eEj0aUnr4Jmbr1bX18GDWxt626GDGp-Sp1-F-LV1jE6AdBOB9nuxQ1FMYL4eFjCYUAAkOBTjybTbpBJjynz3ocn91sLNwDD56jyPAvqp1zf4iFo6r6romIAyMn548c-90GhdDcKE929sV8w52i-djwyTSdVQmUQ5HjcFXTXciZSyN0hvGjgh6geHGDxg0BBN9bTfg2kiVuCx_pKxNbUen2nfrRsrYDXyL2QQxrNZP1IBY1wS0wcGf9II84up9jrxOHXSMjomlFN_9GS7YKETCP0BFSMm-7kjrqkTu-b0VI2AidReEBRjjbXCNSuSnU0snbKuH-JuvoLi9fR64NwOgCqKSdmTnO-Z-2yKodobfvPxNQJtZQoLDIOkcV3BanrRkgWqUuFHEarVmEdIWDIQrAM4oiQC8vA-5Ng5VSb-RJc1GeCdS_2PO5TZR87ew2RdI3Nc2bYvCeUR7EcY4lxk8GPBpKp7HGcYcqIMt9rCjCKgyvd2buX7jWMsjMHblLwQ-I-c0eGhaNE9nwWT1zvbaVXZ-ABT4Xcodg_5SPUmlgHiGAbzOaVpUS5GngUKlAzlVM9Rg.gSK_Wlj6v1uuo5Dm2g0z7A/__results___files/__results___6_0.png)
+
+해석 방법
+
+- 파란색 실선은 가장 왼쪽 값 또는 기준값으로부터 예측 값의 변화를 뜻하며 칠해진 부분은 신뢰구간을 뜻함
+
+두 개의 feature의 교호 작용을 확인할 수도 있다.
+
+```python
+# Similar to previous PDP plot except we use pdp_interact instead of pdp_isolate and pdp_interact_plot instead of pdp_isolate_plot
+features_to_plot = ['Goal Scored', 'Distance Covered (Kms)']
+inter1  =  pdp.pdp_interact(model=tree_model, dataset=val_X, model_features=feature_names, features=features_to_plot)
+
+pdp.pdp_interact_plot(pdp_interact_out=inter1, feature_names=features_to_plot, plot_type='contour')
+plt.show()
+```
+
+![img](https://www.kaggleusercontent.com/kf/79126753/eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..Whbd7vVat8iY3io1R8qrPw.-icQF64mQPRGHCs0t88mXzSrs1luF3fHG9zgnY1AgmXRDxB6WE2rihuPxVLi5I5t7cNmezgBYKTpU9gg4eEj0aUnr4Jmbr1bX18GDWxt626GDGp-Sp1-F-LV1jE6AdBOB9nuxQ1FMYL4eFjCYUAAkOBTjybTbpBJjynz3ocn91sLNwDD56jyPAvqp1zf4iFo6r6romIAyMn548c-90GhdDcKE929sV8w52i-djwyTSdVQmUQ5HjcFXTXciZSyN0hvGjgh6geHGDxg0BBN9bTfg2kiVuCx_pKxNbUen2nfrRsrYDXyL2QQxrNZP1IBY1wS0wcGf9II84up9jrxOHXSMjomlFN_9GS7YKETCP0BFSMm-7kjrqkTu-b0VI2AidReEBRjjbXCNSuSnU0snbKuH-JuvoLi9fR64NwOgCqKSdmTnO-Z-2yKodobfvPxNQJtZQoLDIOkcV3BanrRkgWqUuFHEarVmEdIWDIQrAM4oiQC8vA-5Ng5VSb-RJc1GeCdS_2PO5TZR87ew2RdI3Nc2bYvCeUR7EcY4lxk8GPBpKp7HGcYcqIMt9rCjCKgyvd2buX7jWMsjMHblLwQ-I-c0eGhaNE9nwWT1zvbaVXZ-ABT4Xcodg_5SPUmlgHiGAbzOaVpUS5GngUKlAzlVM9Rg.gSK_Wlj6v1uuo5Dm2g0z7A/__results___files/__results___12_0.png)
+
+**주의사항**
+
+- Partial plot을 했을 때 `feat_a`가 `feat_b`보다 기울기가 더 크다면 permutation importance도 `feat_a`가 더 클까?
+  - 답은 아니다. `feat_a`의 거의 모든 값이 동일하다면 `feat_a`가 변함에 따라 예측 값도 변화하더라도 그 양이 적기 때문에 permutation importance는 작을 것이다.
+- 그 반대로 partial plot 결과 기울기가 0이라도 permutation importance는 클 수 있다.
+
+```python
+import numpy as np
+from numpy.random import rand
+import eli5
+from eli5.sklearn import PermutationImportance
+
+n_samples = 20000
+
+# Create array holding predictive feature
+X1 = 4 * rand(n_samples) - 2
+X2 = 4 * rand(n_samples) - 2
+# Create y
+y = X1 * X2
+
+
+# create dataframe because pdp_isolate expects a dataFrame as an argument
+my_df = pd.DataFrame({'X1': X1, 'X2': X2, 'y': y})
+predictors_df = my_df.drop(['y'], axis=1)
+
+my_model = RandomForestRegressor(n_estimators=30, random_state=1).fit(predictors_df, my_df.y)
+
+
+pdp_dist = pdp.pdp_isolate(model=my_model, dataset=my_df, model_features=['X1', 'X2'], feature='X1')
+pdp.pdp_plot(pdp_dist, 'X1')
+plt.show()
+
+perm = PermutationImportance(my_model).fit(predictors_df, my_df.y)
+
+# show the weights for the permutation importance you just calculated
+eli5.show_weights(perm, feature_names = ['X1', 'X2'])
+```
+
+![image-20211130172819428](README.assets/image-20211130172819428.png)
+
+![image-20211130172828632](README.assets/image-20211130172828632.png)
+
+
+
+## SHAP Values
+
+SHapley Additive exPlanations의 약자로 특정 feature에 대하여 기준 값을 사용했을 때와 비교하여 예측값을 비교하여 해석한다.
+
+**shap** 라이브러리를 이용하여 구할 수 있다.
+
+```python
+import shap  # package used to calculate Shap values
+
+row_to_show = 5
+data_for_prediction = val_X.iloc[row_to_show]  # use 1 row of data here. Could use multiple rows if desired
+
+# Create object that can calculate shap values
+explainer = shap.TreeExplainer(my_model)
+
+# Calculate Shap values
+shap_values = explainer.shap_values(data_for_prediction)
+
+
+shap.initjs()
+shap.force_plot(explainer.expected_value[1], shap_values[1], data_for_prediction)
+```
+
+![image-20211130175729877](README.assets/image-20211130175729877.png)
+
+- `shap.TreeExplainer` : 트리 모델에 사용
+- `shap.DeepExplainer` : 딥러닝 모델에 사용
+- `shap.KernelExplainer` : 모든 모델에 사용 가능하지만 속도가 느리고 정확한 값 대신 추정값을 냄
+
+해석 방법
+
+- 기준값 0.5013, 기대치 0.71. 기준값은 E(y_hat)으로 예측 값의 평균이라고 함.
+- 빨간색은 예측값을 증가하게 하는 feature, 파란색은 감소하게 하는 feature, 길이는 영향의 크기.
+- 빨간색의 길이-파란색 길이 = 기대치-기준값
+
+
+
+Permutation Importance로 어떤 feature의 영향이 가장 큰 지 확인 > 해당 feature에 대하여 Partial Plot을 확인 및 영향이 작은 feature와 비교 > 확인할 특정 데이터에 대하여 SHAP Value 확인
+
+
+
+## Advanced Uses of SHAP Values
+
+Permutation importance의 단점은 feature가 어떻게 영향을 주는지 알 수 없다는 점이다. 예를 들어 값이 중간 정도라고 할 때
+
+- 몇몇 예측에서 큰 영향을 주고 나머지는 적은 영향을 주는지
+- 전체적으로 중간 정도의 영향을 주는지
+
+알 방법이 없다는 단점이 있다.
+
+
+
+**shap** 라이브러리를 이용하여 feature가 전체적으로 어떻게 영향을 줬는지 확인할 수 있다.
+
+```python
+import shap  # package used to calculate Shap values
+
+# Create object that can calculate shap values
+explainer = shap.TreeExplainer(my_model)
+
+# calculate shap values. This is what we will plot.
+# Calculate shap_values for all of val_X rather than a single row, to have more data for plot.
+shap_values = explainer.shap_values(val_X)
+
+# Make plot. Index of [1] is explained in text below.
+shap.summary_plot(shap_values[1], val_X)
+```
+
+<img src="https://www.kaggleusercontent.com/kf/79126666/eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..NYPgXh17AF3ngDkaSDUbuQ.kXCVWn10XTEX0bViYSOOk3jXc94frunaNDfc3vyEB0FqJ05GcELF3tx77bkP_JonuTlYHaWiUbFoVWrc-2l9fyXdmWhXkmYA29cMryB1gmEpzOi8f_VGq0wGpuQ-rQzwPPwpsEbnh4sQtqR3fHw6hb7yJ1skLYcGYDnK42pMJfn47qOMwgq9Mon-mrU2d8_aOqvonH9SJYWXEzAxmfAJ4JjVaEI2UKlWtbu7W9IOK147he3a7n6dyPJOdQCW9VVdcEynNEcKmzG_hvKJoqpx8a9xSg5pP8aTQR95lPDMS5TC_YhleFgjMKFMO2MewKKYEV8jlujGJnv1QIKa5w_ok4Z8A6IBuk85ur8T_h9pk8PVUS2FW0N7W4qxat7FbKdzGT1dgrxv5xgRdi87hF5zpyfOh619MvP1Y7QB09kR7DJ414wfLlr50-IDGSndcD6wHidxQat-76kXfnPatykyp2eTgTHj_NG9qntlEqUgSLhWSybW4ZlnvAIXF5WE5u0e5l79Nqptj3kczdYD1n1Oz58GaSBiGSa4wKZChlm12A1Pt-d1hUIE6lOyaiHIfUIDKnp9tTIhXzL737ZWg-lX6tMGMW7hRrEGRilolIaI4XHSlOSNuoSHF_9jhA0jnTAE1Ck99es3KHR-d-A3I_ctJAqMDnV-WPjiHyICmqpjtg8.iye9bHAoDpajs6HjHroMdQ/__results___files/__results___4_0.png" alt="img" style="zoom:80%;" />
+
+- `shap_values[1]` : 예측 값이 True를 기준으로 plot
+- 시간이 오래 걸리는 편이지만 예외적으로 `xgboost`에 최적화되어 있어 xgboost에는 비교적 빠르다.
+
+해석 방법
+
+- 세로축 : feature
+- 색 : 데이터셋의 특정 행의 값이 각 열에서 큰지 작은지를 나타냄
+- 가로축 : SHAP value로 얼마나 영향을 줬는지를 나타냄
+- `Red`와 `Yellow & Red`는 영향을 거의 주지 않음
+- `Yellow Card`는 영향을 거의 주지 않는 편이지만 에외적인(값이 높으면서 예측에 마이너스 영향을 주는) 상황이 있다.
+- 득점이 높을수록 양의 영향, 낮을수록 음의 영향을 준다.
+
+
+
+feature간 상호작용도 확인할 수 있다.
+
+```python
+import shap  # package used to calculate Shap values
+
+# Create object that can calculate shap values
+explainer = shap.TreeExplainer(my_model)
+
+# calculate shap values. This is what we will plot.
+shap_values = explainer.shap_values(X)
+
+# make plot.
+shap.dependence_plot('Ball Possession %', shap_values[1], X, interaction_index="Goal Scored")
+```
+
+![img](https://www.kaggleusercontent.com/kf/79126666/eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..NYPgXh17AF3ngDkaSDUbuQ.kXCVWn10XTEX0bViYSOOk3jXc94frunaNDfc3vyEB0FqJ05GcELF3tx77bkP_JonuTlYHaWiUbFoVWrc-2l9fyXdmWhXkmYA29cMryB1gmEpzOi8f_VGq0wGpuQ-rQzwPPwpsEbnh4sQtqR3fHw6hb7yJ1skLYcGYDnK42pMJfn47qOMwgq9Mon-mrU2d8_aOqvonH9SJYWXEzAxmfAJ4JjVaEI2UKlWtbu7W9IOK147he3a7n6dyPJOdQCW9VVdcEynNEcKmzG_hvKJoqpx8a9xSg5pP8aTQR95lPDMS5TC_YhleFgjMKFMO2MewKKYEV8jlujGJnv1QIKa5w_ok4Z8A6IBuk85ur8T_h9pk8PVUS2FW0N7W4qxat7FbKdzGT1dgrxv5xgRdi87hF5zpyfOh619MvP1Y7QB09kR7DJ414wfLlr50-IDGSndcD6wHidxQat-76kXfnPatykyp2eTgTHj_NG9qntlEqUgSLhWSybW4ZlnvAIXF5WE5u0e5l79Nqptj3kczdYD1n1Oz58GaSBiGSa4wKZChlm12A1Pt-d1hUIE6lOyaiHIfUIDKnp9tTIhXzL737ZWg-lX6tMGMW7hRrEGRilolIaI4XHSlOSNuoSHF_9jhA0jnTAE1Ck99es3KHR-d-A3I_ctJAqMDnV-WPjiHyICmqpjtg8.iye9bHAoDpajs6HjHroMdQ/__results___files/__results___6_1.png)
+
+대체적으로 볼 점유율이 높으면 SHAP가 증가하는 걸 볼 수 있으나 득점이 적으면 음수값을 가짐을 확인할 수 있다.
