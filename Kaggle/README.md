@@ -1200,9 +1200,16 @@ from mlxtend.preprocessing import minmax_scaling
 
 scaled_data = minmax_scaling(original_data, columns=[0]) # columns=컬럼 명 또는 indices
 # min_val, max_val로 범위 지정 가능
+
+# plot both together to compare
+fig, ax = plt.subplots(1,2)
+sns.distplot(original_data, ax=ax[0])
+ax[0].set_title("Original Data")
+sns.distplot(scaled_data, ax=ax[1])
+ax[1].set_title("Scaled data")
 ```
 
-![img](https://www.kaggleusercontent.com/kf/79128079/eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..wMiReRSRMMG6Q2L83kJNAA.bcKUVRxhCost1mCV2QUBMqdRSi6o-aH6m7d_nd28d5waKFeuL4yx4Ms9ftE1fMNO7358eL-wE5fhLggc8SXSUMDQPKnd95qk_A-wUGqeZFtSi9mqUCW2Zv3aqgee1xEOQB9XIJXFfVH9Pbl1Yao5ou62VuUZPJGOFhiB_vRU1rOqqIQBiCSbRDUVFzaKcEx0tjD0pHWsQoPhCJF9T0EkYb9UrTsWcE0r_dMYKKtPnSc9nqF_HEqbCgbqaVsVlHzsVFnCHZpuEvrH4rUOVyesbHWRY_R7LuCNt1iKUjUhCHxqOJ-ABCRzL1vE3WeFWUOJRukyJ-ch_zbTm2xwNvGrikqkkYso032kz6pJ2N0ETUED9SNPZBdq1uzp18l7hZsqB8y2ggjP6D3gP0SxSlACPvlMM--su2N6ehSATMSYMvEPC9_aS9JfyGdzBjBShAnmWfHezV8tQmPLVlxKWuDqgEoIWsJ0BzFK7To2GO5KAbXAL_Y4SghM4oWTNpCpuKZaCCfRWSRRrxoQ2-y8wzae8BsKFxzoecgK-8MxC_A99CHegDap7oqrF5n_ji7fuIZiXqNv3VrfpK48OWe35qrXODgAyvy4XcIBXe9Ri5msii9Ce4romSify9sIA_Xt3WSlF8R0oSdqtUJUQGPS8KEq7N3Yi1anNG_dlgdslpjGLgs.rxQ2SOVp_yoRQWqxGOjuGw/__results___files/__results___4_2.png)
+![image-20211201175142988](README.assets/image-20211201175142988.png)
 
 
 
@@ -1212,9 +1219,16 @@ scaled_data = minmax_scaling(original_data, columns=[0]) # columns=컬럼 명 �
 from scipy import stats
 
 normalized_data = stats.boxcox(original_data) # original_data의 모든 값이 0보다 커야함
+
+# plot both together to compare
+fig, ax=plt.subplots(1,2)
+sns.distplot(original_data, ax=ax[0])
+ax[0].set_title("Original Data")
+sns.distplot(normalized_data[0], ax=ax[1])
+ax[1].set_title("Normalized data")
 ```
 
-![img](https://www.kaggleusercontent.com/kf/79128079/eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..wMiReRSRMMG6Q2L83kJNAA.bcKUVRxhCost1mCV2QUBMqdRSi6o-aH6m7d_nd28d5waKFeuL4yx4Ms9ftE1fMNO7358eL-wE5fhLggc8SXSUMDQPKnd95qk_A-wUGqeZFtSi9mqUCW2Zv3aqgee1xEOQB9XIJXFfVH9Pbl1Yao5ou62VuUZPJGOFhiB_vRU1rOqqIQBiCSbRDUVFzaKcEx0tjD0pHWsQoPhCJF9T0EkYb9UrTsWcE0r_dMYKKtPnSc9nqF_HEqbCgbqaVsVlHzsVFnCHZpuEvrH4rUOVyesbHWRY_R7LuCNt1iKUjUhCHxqOJ-ABCRzL1vE3WeFWUOJRukyJ-ch_zbTm2xwNvGrikqkkYso032kz6pJ2N0ETUED9SNPZBdq1uzp18l7hZsqB8y2ggjP6D3gP0SxSlACPvlMM--su2N6ehSATMSYMvEPC9_aS9JfyGdzBjBShAnmWfHezV8tQmPLVlxKWuDqgEoIWsJ0BzFK7To2GO5KAbXAL_Y4SghM4oWTNpCpuKZaCCfRWSRRrxoQ2-y8wzae8BsKFxzoecgK-8MxC_A99CHegDap7oqrF5n_ji7fuIZiXqNv3VrfpK48OWe35qrXODgAyvy4XcIBXe9Ri5msii9Ce4romSify9sIA_Xt3WSlF8R0oSdqtUJUQGPS8KEq7N3Yi1anNG_dlgdslpjGLgs.rxQ2SOVp_yoRQWqxGOjuGw/__results___files/__results___6_2.png)
+![image-20211201175201411](README.assets/image-20211201175201411.png)
 
 
 
@@ -1530,7 +1544,7 @@ campsites.plot(color='maroon', markersize=2, ax=ax)
 trails.plot(color='black', markersize=1, ax=ax)
 ```
 
-![img](https://www.kaggleusercontent.com/kf/79128018/eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..NyXIikJq4xBfjza4ChOXww.0snfNQMmIfFjO0ySHvK_3qmaOBIdRKLs5HalAs2K9TlFGkYM0ZL2c4bmKfjaQkpUADhDwxvZ_Qlt9Lza6iwYLq6lr-Nmpy70eANcTLa1OTkEDQePRSKqqCbUciQWjGlsUHqqEJMzA1bPzyVNEMoUaN5H_MvPWl5uqoA3B04efsbx1ckuylF5bgaAcM125rQlqJQF_Rd0s_ulMbKb2NeAq4IIVPPktEkac-tJ10Ng32pm-mq8uaqU7KVTqCVP3HdX6MblAxSeo49GxFuVsP5ViB3a0lGiF0DM5p5xNgEnqEftkAvWu3ykNoKb8fSaDl595mZmwoBRZVwHqMDEst6dqLHL2oDGg5ir3QAm2IuLXM52b0oyyaWTlxggrwnJnSlX_8p1wl6lJFsspaQ95KDtNJGf1kzN3QB3gFZ1C26d9GAljHov2AWsFZXtBhGc0Qkp7aeUSy8GDQrXg9sSo7Gil1B06Zxew7DslBvGsfNKTn0NEulAsNxbDJRuyFmFJMmmOFCcm5ttaI9jhQwP3T1UZFtKkN6rcaxjDwCs8dJayJ8VFPBZICsfwxWdcxHzD20BvOYdl5Cc1NuPbBwFzKfBIBS5XwmT_yeuxDCzg_pBp7FPySqykQVbUt6edZsVk-IIL_k4U_Mi5mOmmXIuZctXvpXHX6zDBvJp_Xa-Oi8gAdE.AboJXEgppAwam3jah6Ynsg/__results___files/__results___19_1.png)
+![image-20211201175253700](README.assets/image-20211201175253700.png)
 
 
 
@@ -1577,7 +1591,7 @@ ax = regions.plot(figsize=(8,8), color='whitesmoke', linestyle=':', edgecolor='b
 facilities.to_crs(epsg=32630).plot(markersize=1, ax=ax)
 ```
 
-![img](https://www.kaggleusercontent.com/kf/79127978/eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..ajl6ZXZ9g4kPbhv0s3DV7A.rJQ2kAFHUxDAjGub8i3Z2vHH1mDdjebIYNCZi2pHAJ1SdsyZMLH1yh0V_Rc0DK0WgJTLFhwkWWKvys4RRbITDfq9Fr724TpRgDKdbyPQyWctocPs-wVoWKNxUH9MtBOnddAQpqNOgnksuji-zwDe39-28mqiDVYwKt0kdFAq2oZISRlRGs0t022zFVWcXstMvo_yMEE-t0dgC3BDg3itYZucf9yHjTj9c3uEMonOTLY7Nsxpjc06N62VpzmfwWMBNy1zJHVihzD2MY3RHxZVM4AaAn-6ufazRfpx4gGyhLAPUlvvGeiJBxh_Ef_mdnATtYhdrCHhE7AGjPi_98XI_EmtlDUW1Q28eG3iEj97e2w-bEiNI3X1Ywgb2_pQ6qcotTWLV5iJncrKQ-63FXOW5LT7hWVk6dGi3yeKw0a_J3mPOLjS792Ahw6f5-qo34xoY5P_4gAycJ0YLRehhLv-WUzBQPrHNc0ZbYFtC7r3CugLXe0T2A8511UWxg-a6acin3PUdXiCRGuwpLHJ5AAlSHX3ftJGTOwDEPMDs92dUEpEL9VI3nT0ICufsD_pTOICtx73sa8WFFNzq12YsdNofA5w7pz69ykKqW6S7bLUuUNiLWMqmu89a0x3mxIJ4MjwZeV4E5sigeJm0Tu7xMIdghCLBLUnjY48NYIUWP-rii8.UCjBSAbHqqo6rUbUyqM9Jg/__results___files/__results___8_1.png)
+![image-20211201175324820](README.assets/image-20211201175324820.png)
 
 
 
@@ -1943,7 +1957,7 @@ pdp.pdp_plot(pdp_goals, 'Goal Scored')
 plt.show()
 ```
 
-![img](https://www.kaggleusercontent.com/kf/79126753/eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..Whbd7vVat8iY3io1R8qrPw.-icQF64mQPRGHCs0t88mXzSrs1luF3fHG9zgnY1AgmXRDxB6WE2rihuPxVLi5I5t7cNmezgBYKTpU9gg4eEj0aUnr4Jmbr1bX18GDWxt626GDGp-Sp1-F-LV1jE6AdBOB9nuxQ1FMYL4eFjCYUAAkOBTjybTbpBJjynz3ocn91sLNwDD56jyPAvqp1zf4iFo6r6romIAyMn548c-90GhdDcKE929sV8w52i-djwyTSdVQmUQ5HjcFXTXciZSyN0hvGjgh6geHGDxg0BBN9bTfg2kiVuCx_pKxNbUen2nfrRsrYDXyL2QQxrNZP1IBY1wS0wcGf9II84up9jrxOHXSMjomlFN_9GS7YKETCP0BFSMm-7kjrqkTu-b0VI2AidReEBRjjbXCNSuSnU0snbKuH-JuvoLi9fR64NwOgCqKSdmTnO-Z-2yKodobfvPxNQJtZQoLDIOkcV3BanrRkgWqUuFHEarVmEdIWDIQrAM4oiQC8vA-5Ng5VSb-RJc1GeCdS_2PO5TZR87ew2RdI3Nc2bYvCeUR7EcY4lxk8GPBpKp7HGcYcqIMt9rCjCKgyvd2buX7jWMsjMHblLwQ-I-c0eGhaNE9nwWT1zvbaVXZ-ABT4Xcodg_5SPUmlgHiGAbzOaVpUS5GngUKlAzlVM9Rg.gSK_Wlj6v1uuo5Dm2g0z7A/__results___files/__results___6_0.png)
+![image-20211201175417628](README.assets/image-20211201175417628.png)
 
 해석 방법
 
@@ -1960,7 +1974,7 @@ pdp.pdp_interact_plot(pdp_interact_out=inter1, feature_names=features_to_plot, p
 plt.show()
 ```
 
-![img](https://www.kaggleusercontent.com/kf/79126753/eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..Whbd7vVat8iY3io1R8qrPw.-icQF64mQPRGHCs0t88mXzSrs1luF3fHG9zgnY1AgmXRDxB6WE2rihuPxVLi5I5t7cNmezgBYKTpU9gg4eEj0aUnr4Jmbr1bX18GDWxt626GDGp-Sp1-F-LV1jE6AdBOB9nuxQ1FMYL4eFjCYUAAkOBTjybTbpBJjynz3ocn91sLNwDD56jyPAvqp1zf4iFo6r6romIAyMn548c-90GhdDcKE929sV8w52i-djwyTSdVQmUQ5HjcFXTXciZSyN0hvGjgh6geHGDxg0BBN9bTfg2kiVuCx_pKxNbUen2nfrRsrYDXyL2QQxrNZP1IBY1wS0wcGf9II84up9jrxOHXSMjomlFN_9GS7YKETCP0BFSMm-7kjrqkTu-b0VI2AidReEBRjjbXCNSuSnU0snbKuH-JuvoLi9fR64NwOgCqKSdmTnO-Z-2yKodobfvPxNQJtZQoLDIOkcV3BanrRkgWqUuFHEarVmEdIWDIQrAM4oiQC8vA-5Ng5VSb-RJc1GeCdS_2PO5TZR87ew2RdI3Nc2bYvCeUR7EcY4lxk8GPBpKp7HGcYcqIMt9rCjCKgyvd2buX7jWMsjMHblLwQ-I-c0eGhaNE9nwWT1zvbaVXZ-ABT4Xcodg_5SPUmlgHiGAbzOaVpUS5GngUKlAzlVM9Rg.gSK_Wlj6v1uuo5Dm2g0z7A/__results___files/__results___12_0.png)
+![image-20211201175445172](README.assets/image-20211201175445172.png)
 
 **주의사항**
 
@@ -2074,7 +2088,7 @@ shap_values = explainer.shap_values(val_X)
 shap.summary_plot(shap_values[1], val_X)
 ```
 
-<img src="https://www.kaggleusercontent.com/kf/79126666/eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..NYPgXh17AF3ngDkaSDUbuQ.kXCVWn10XTEX0bViYSOOk3jXc94frunaNDfc3vyEB0FqJ05GcELF3tx77bkP_JonuTlYHaWiUbFoVWrc-2l9fyXdmWhXkmYA29cMryB1gmEpzOi8f_VGq0wGpuQ-rQzwPPwpsEbnh4sQtqR3fHw6hb7yJ1skLYcGYDnK42pMJfn47qOMwgq9Mon-mrU2d8_aOqvonH9SJYWXEzAxmfAJ4JjVaEI2UKlWtbu7W9IOK147he3a7n6dyPJOdQCW9VVdcEynNEcKmzG_hvKJoqpx8a9xSg5pP8aTQR95lPDMS5TC_YhleFgjMKFMO2MewKKYEV8jlujGJnv1QIKa5w_ok4Z8A6IBuk85ur8T_h9pk8PVUS2FW0N7W4qxat7FbKdzGT1dgrxv5xgRdi87hF5zpyfOh619MvP1Y7QB09kR7DJ414wfLlr50-IDGSndcD6wHidxQat-76kXfnPatykyp2eTgTHj_NG9qntlEqUgSLhWSybW4ZlnvAIXF5WE5u0e5l79Nqptj3kczdYD1n1Oz58GaSBiGSa4wKZChlm12A1Pt-d1hUIE6lOyaiHIfUIDKnp9tTIhXzL737ZWg-lX6tMGMW7hRrEGRilolIaI4XHSlOSNuoSHF_9jhA0jnTAE1Ck99es3KHR-d-A3I_ctJAqMDnV-WPjiHyICmqpjtg8.iye9bHAoDpajs6HjHroMdQ/__results___files/__results___4_0.png" alt="img" style="zoom:80%;" />
+![image-20211201142642714](README.assets/image-20211201142642714.png)
 
 - `shap_values[1]` : 예측 값이 True를 기준으로 plot
 - 시간이 오래 걸리는 편이지만 예외적으로 `xgboost`에 최적화되어 있어 xgboost에는 비교적 빠르다.
@@ -2105,6 +2119,433 @@ shap_values = explainer.shap_values(X)
 shap.dependence_plot('Ball Possession %', shap_values[1], X, interaction_index="Goal Scored")
 ```
 
-![img](https://www.kaggleusercontent.com/kf/79126666/eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..NYPgXh17AF3ngDkaSDUbuQ.kXCVWn10XTEX0bViYSOOk3jXc94frunaNDfc3vyEB0FqJ05GcELF3tx77bkP_JonuTlYHaWiUbFoVWrc-2l9fyXdmWhXkmYA29cMryB1gmEpzOi8f_VGq0wGpuQ-rQzwPPwpsEbnh4sQtqR3fHw6hb7yJ1skLYcGYDnK42pMJfn47qOMwgq9Mon-mrU2d8_aOqvonH9SJYWXEzAxmfAJ4JjVaEI2UKlWtbu7W9IOK147he3a7n6dyPJOdQCW9VVdcEynNEcKmzG_hvKJoqpx8a9xSg5pP8aTQR95lPDMS5TC_YhleFgjMKFMO2MewKKYEV8jlujGJnv1QIKa5w_ok4Z8A6IBuk85ur8T_h9pk8PVUS2FW0N7W4qxat7FbKdzGT1dgrxv5xgRdi87hF5zpyfOh619MvP1Y7QB09kR7DJ414wfLlr50-IDGSndcD6wHidxQat-76kXfnPatykyp2eTgTHj_NG9qntlEqUgSLhWSybW4ZlnvAIXF5WE5u0e5l79Nqptj3kczdYD1n1Oz58GaSBiGSa4wKZChlm12A1Pt-d1hUIE6lOyaiHIfUIDKnp9tTIhXzL737ZWg-lX6tMGMW7hRrEGRilolIaI4XHSlOSNuoSHF_9jhA0jnTAE1Ck99es3KHR-d-A3I_ctJAqMDnV-WPjiHyICmqpjtg8.iye9bHAoDpajs6HjHroMdQ/__results___files/__results___6_1.png)
+![image-20211201142707646](README.assets/image-20211201142707646.png)
 
 대체적으로 볼 점유율이 높으면 SHAP가 증가하는 걸 볼 수 있으나 득점이 적으면 음수값을 가짐을 확인할 수 있다.
+
+
+
+
+
+# Natural Language Processing
+
+## Intro to NLP
+
+**spaCy** 라이브러리를 이용하여 영어 NLP 처리를 할 수 있다.
+
+```python
+import spacy
+nlp = spacy.load('en_core_web_sm') # 영어 모델
+```
+
+
+
+**Tokenizing**
+
+```python
+doc = nlp("Tea is healthy and calming, don't you think?")
+
+for token in doc:
+    print(token)
+    
+"""
+Tea
+is
+healthy
+and
+calming
+,
+do
+n't
+you
+think
+?
+"""
+```
+
+
+
+원형과 불용어인지 파악할 수 있다.
+
+- `token.lemma_` : 단어(토큰)의 원형을 알려줌
+- `token.is_stop` : 단어(토큰)가 불용어인지 True/False로 반환
+  - 불용어를 없애는 것이 모델의 예측력을 높일 수도 있으나 항상 그런 것만은 아니다.
+
+
+
+`PhraseMatcher`를 이용하여 패턴 매치도 가능하다. (정규식을 이용할 수도 있음)
+
+```python
+from spacy.matcher import PhraseMatcher
+matcher = PhraseMatcher(nlp.vocab, attr='LOWER') # 소문자로 매치
+
+# 찾을 패턴 만들기
+terms = ['Galaxy Note', 'iPhone 11', 'iPhone XS', 'Google Pixel']
+patterns = [nlp(text) for text in terms]
+matcher.add("TerminologyList", patterns)
+
+# Borrowed from https://daringfireball.net/linked/2019/09/21/patel-11-pro
+text_doc = nlp("Glowing review overall, and some really interesting side-by-side "
+               "photography tests pitting the iPhone 11 Pro against the "
+               "Galaxy Note 10 Plus and last year’s iPhone XS and Google Pixel 3.") 
+matches = matcher(text_doc)
+print(matches)
+
+
+"""
+[(3766102292120407359, 17, 19), (3766102292120407359, 22, 24), (3766102292120407359, 30, 32), (3766102292120407359, 33, 35)]
+"""
+```
+
+
+
+결과값은 각각 match id, 구문의 시작과 끝 위치이다.
+
+```python
+match_id, start, end = matches[0]
+print(nlp.vocab.strings[match_id], text_doc[start:end])
+
+"""
+TerminologyList iPhone 11
+"""
+```
+
+
+
+## Text Classification
+
+주로 **Bag of Words**나 **TF-IDF**를 이용하여 분류 예측을 한다.
+
+"Tea is life. Tea is love"와 "Tea is healthy, calming, and delicious" 두 문장을 토큰화하면 `{"tea", "is", "life", "love", "healthy", "calming", "and", "delicious"}`이며 BOW로 표현하면
+$$
+v_1 = [2 \ 2 \ 1 \ 1 \ 0 \ 0 \ 0 \ 0] \\
+v_2 = [1 \ 1 \ 0 \ 0 \ 1 \ 1 \ 1 \ 1]
+$$
+이다.
+
+1. `spacy` 라이브러리의 `add_pipe`를 이용하여 분류할 수 있다.
+
+```python
+import spacy
+
+# Create an empty model
+nlp = spacy.blank("en")
+
+# Add the TextCategorizer to the empty model
+textcat = nlp.add_pipe("textcat")
+
+# Add labels to text classifier
+textcat.add_label("ham")
+textcat.add_label("spam")
+```
+
+
+
+2. spacy가 `{'ham': True, 'spam': False}`처럼 True와 False로 분류할 수 있도록 새롭게 dictionary를 만들어야 한다.
+
+```python
+train_texts = spam['text'].values
+train_labels = [{'cats': {'ham': label == 'ham',
+                          'spam': label == 'spam'}} 
+                for label in spam['label']]
+
+train_data = list(zip(train_texts, train_labels))
+train_data[:3]
+
+"""
+[('Go until jurong point, crazy.. Available only in bugis n great world la e buffet... Cine there got amore wat...',
+  {'cats': {'ham': True, 'spam': False}}),
+ ('Ok lar... Joking wif u oni...', {'cats': {'ham': True, 'spam': False}}),
+ ("Free entry in 2 a wkly comp to win FA Cup final tkts 21st May 2005. Text FA to 87121 to receive entry question(std txt rate)T&C's apply 08452810075over18's",
+  {'cats': {'ham': False, 'spam': True}})]
+"""
+```
+
+
+
+3. 학습을 위하여 먼저 `nlp.begin_training()`으로 `optimizer`를 생성한 뒤 `minibatch`를 이용하여 `nlp.update`해준다.
+
+```python
+from spacy.util import minibatch
+from spacy.training.example import Example
+
+spacy.util.fix_random_seed(1)
+optimizer = nlp.begin_training()
+
+# Create the batch generator with batch size = 8
+batches = minibatch(train_data, size=8)
+# Iterate through minibatches
+for batch in batches:
+    # Each batch is a list of (text, label) 
+    for text, labels in batch:
+        doc = nlp.make_doc(text)
+        example = Example.from_dict(doc, labels)
+        nlp.update([example], sgd=optimizer)
+```
+
+
+
+4. 위 코드는 epoch=1인 경우이다. 아래처럼 여러 번 반복하여 학습시켜야 하며 batch가 반복할 때마다 다르게 되도록 shuffle 해주는 것이 좋다.
+
+```python
+import random
+
+random.seed(1)
+spacy.util.fix_random_seed(1)
+optimizer = nlp.begin_training()
+
+losses = {}
+for epoch in range(10):
+    random.shuffle(train_data)
+    # Create the batch generator with batch size = 8
+    batches = minibatch(train_data, size=8)
+    # Iterate through minibatches
+    for batch in batches:
+        for text, labels in batch:
+            doc = nlp.make_doc(text)
+            example = Example.from_dict(doc, labels)
+            nlp.update([example], sgd=optimizer, losses=losses)
+    print(losses)
+```
+
+
+
+5. 예측을 해본다.
+
+```python
+texts = ["Are you ready for the tea party????? It's gonna be wild",
+         "URGENT Reply to this message for GUARANTEED FREE TEA" ]
+docs = [nlp.tokenizer(text) for text in texts]
+    
+# Use textcat to get the scores for each doc
+textcat = nlp.get_pipe('textcat')
+scores = textcat.predict(docs)
+
+print(scores)
+
+"""
+[[9.9999440e-01 5.5444802e-06]
+ [1.6431263e-04 9.9983561e-01]]
+"""
+```
+
+```python
+# From the scores, find the label with the highest score/probability
+predicted_labels = scores.argmax(axis=1)
+print([textcat.labels[label] for label in predicted_labels])
+
+"""
+['ham', 'spam']
+"""
+```
+
+또는 한 문장만 분류할 때는 아래와 같은 방법도 된다.
+
+```python
+text = "This tea cup was full of holes. Do not recommend."
+doc = nlp(text)
+print(doc.cats)
+```
+
+
+
+전체를 모으면 다음과 같다.
+
+```python
+import pandas as pd
+
+# 데이터를 불러오기
+def load_data(csv_file, split=0.9):
+    data = pd.read_csv(csv_file)
+    
+    # Shuffle data
+    train_data = data.sample(frac=1, random_state=7)
+    
+    texts = train_data.text.values
+    labels = [{"POSITIVE": bool(y), "NEGATIVE": not bool(y)}
+              for y in train_data.sentiment.values]
+    split = int(len(train_data) * split)
+    
+    train_labels = [{"cats": labels} for labels in labels[:split]]
+    val_labels = [{"cats": labels} for labels in labels[split:]]
+    
+    return texts[:split], train_labels, texts[split:], val_labels
+
+train_texts, train_labels, val_texts, val_labels = load_data('../input/nlp-course/yelp_ratings.csv')
+
+
+# 모델 생성
+import spacy
+
+# Create an empty model
+nlp = spacy.blank('en')
+
+# Add the TextCategorizer to the empty model
+textcat = nlp.add_pipe('textcat')
+
+# Add labels to text classifier
+textcat.add_label("NEGATIVE")
+textcat.add_label("POSITIVE")
+
+
+# 훈련 함수 생성 및 훈련
+def train(model, train_data, optimizer, batch_size=8):
+    losses = {}
+    random.seed(1)
+    random.shuffle(train_data)
+
+    for batch in minibatch(train_data, size=batch_size):
+        for text, labels in batch:
+            doc = nlp.make_doc(text)
+            example = Example.from_dict(doc, labels)
+            # Update model with texts and labels
+            model.update([example], sgd=optimizer, losses=losses)
+
+    return losses
+
+# Fix seed for reproducibility
+spacy.util.fix_random_seed(1)
+random.seed(1)
+
+# This may take a while to run!
+optimizer = nlp.begin_training()
+train_data = list(zip(train_texts, train_labels))
+losses = train(nlp, train_data, optimizer)
+print(losses['textcat'])
+
+
+# 예측 함수 생성 및 예측 테스트
+def predict(nlp, texts): 
+    # Use the model's tokenizer to tokenize each input text
+    docs = [nlp.tokenizer(text) for text in texts]
+    
+    # Use textcat to get the scores for each doc
+    textcat = nlp.get_pipe('textcat')
+    scores = textcat.predict(docs)
+    
+    # From the scores, find the class with the highest score/probability
+    predicted_class = scores.argmax(axis=1)
+    
+    return predicted_class
+
+texts = val_texts[34:38]
+predictions = predict(nlp, texts)
+
+for p, t in zip(predictions, texts):
+    print(f"{textcat.labels[p]}: {t} \n")
+    
+    
+# 모델 평가 함수 및 정확도 확인
+def evaluate(model, texts, labels):
+    """ Returns the accuracy of a TextCategorizer model. 
+    
+        Arguments
+        ---------
+        model: ScaPy model with a TextCategorizer
+        texts: Text samples, from load_data function
+        labels: True labels, from load_data function
+    
+    """
+    # Get predictions from textcat model (using your predict method)
+    predicted_class = predict(model, texts)
+    # From labels, get the true class as a list of integers (POSITIVE -> 1, NEGATIVE -> 0)
+    true_class = [int(label['cats']['POSITIVE']) for label in labels]
+    
+    # A boolean or int array indicating correct predictions
+    correct_predictions = predicted_class == true_class
+    
+    # The accuracy, number of correct predictions divided by all predictions
+    accuracy = correct_predictions.mean()
+    
+    return accuracy
+
+accuracy = evaluate(nlp, val_texts, val_labels)
+print(f"Accuracy: {accuracy:.4f}")
+```
+
+
+
+
+
+## Word Vectors
+
+**Word embedding**은 단어를 벡터로 나타낸 것으로 일반적으로 BOW를 사용한 모델보다 더 좋은 성능을 보인다.
+
+이미 잘 학습된 대용량의 영어 모델이 있으므로 `en_core_web_lg`로 불러올 수 있다.
+
+```python
+import numpy as np
+import spacy
+
+# Need to load the large model to get the vectors
+nlp = spacy.load('en_core_web_lg')
+
+# Disabling other pipes because we don't need them and it'll speed up this part a bit
+text = "These vectors can be used as features for machine learning models."
+with nlp.disable_pipes():
+    vectors = np.array([token.vector for token in  nlp(text)])
+```
+
+각 벡터는 300차원이며 문장을 쪼개면 12개의 토큰이므로 12x300의 결과가 나온다.
+
+
+
+모델에 학습시키기 위하여 조정이 필요하며 가장 간단한 방법은 평균을 내는 것이며 spaCy에서 `doc.vector`가 계산을 해준다.
+
+```python
+import pandas as pd
+
+# Loading the spam data
+# ham is the label for non-spam messages
+spam = pd.read_csv('../input/nlp-course/spam.csv')
+
+with nlp.disable_pipes():
+    doc_vectors = np.array([nlp(text).vector for text in spam.text])
+    
+doc_vectors.shape
+
+"""
+(5572, 300)
+"""
+```
+
+이후에는 사이킷런 모델이나 xgboost 등의 모델을 이용하여 분류를 할 수 있다.
+
+
+
+이러한 word vector를 가지고 코사인 유사도를 이용한 문서 유사도를 구할 수 있다.
+
+```python
+def cosine_similarity(a, b):
+    return a.dot(b)/np.sqrt(a.dot(a) * b.dot(b))
+
+a = nlp("REPLY NOW FOR FREE TEA").vector
+b = nlp("According to legend, Emperor Shen Nung discovered tea when leaves from a wild tree blew into his pot of boiling water.").vector
+cosine_similarity(a, b)
+
+"""
+0.7030031
+"""
+```
+
+
+
+때로는 문서 전체에 대하여 중심 벡터를 구한 뒤 모든 벡터에서 중심 벡터를 빼고, 그 후 코사인 유사도를 측정한다. 왜냐하면 이미 같은 주제를 가진 문서들 안에서 유사도를 측정하면 대부분 0.8~1.0의 유사도가 측정되므로 중심 벡터라는 경향을 뺀 뒤 측정을 한다.
+
+```python
+review_vec = nlp(review).vector
+
+## Center the document vectors
+# Calculate the mean for the document vectors, should have shape (300,)
+vec_mean = vectors.mean(axis=0)
+# Subtract the mean from the vectors
+centered = vectors - vec_mean
+
+# Calculate similarities for each document in the dataset
+# Make sure to subtract the mean from the review vector
+sims = np.array([cosine_similarity(review_vec - vec_mean, vec) for vec in centered])
+
+# Get the index for the most similar document
+most_similar = sims.argmax()
+```
+
