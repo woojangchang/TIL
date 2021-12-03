@@ -1,3 +1,78 @@
+- [Data Leakage](#data-leakage)
+  * [Target Leakage](#target-leakage)
+  * [Train-Test Contamination](#train-test-contamination)
+- [Visualization](#visualization)
+  * [Scatter Plots](#scatter-plots)
+    + [scatterplot](#scatterplot)
+    + [regplot](#regplot)
+    + [lmplot](#lmplot)
+    + [swarmplot](#swarmplot)
+  * [Distributions](#distributions)
+    + [distplot](#distplot)
+    + [kdeplot](#kdeplot)
+    + [jointplot](#jointplot)
+  * [Custom Styles](#custom-styles)
+- [Creating Features](#creating-features)
+  * [Mathematical Transform](#mathematical-transform)
+  * [Counts](#counts)
+  * [Building-Up and Breaking Down Features](#building-up-and-breaking-down-features)
+  * [Group Transforms](#group-transforms)
+- [Principal Component Analysis](#principal-component-analysis)
+- [SQL](#sql)
+  * [Select, From & Where](#select--from---where)
+  * [Group By, Having & Count](#group-by--having---count)
+  * [Order By](#order-by)
+  * [As & With](#as---with)
+  * [Joining Data](#joining-data)
+  * [JOINs and UNIONs](#joins-and-unions)
+  * [Analytic Functions](#analytic-functions)
+  * [Nested and Repeated Data](#nested-and-repeated-data)
+  * [Writing Efficient Queries](#writing-efficient-queries)
+- [Stochastic Gradient Descent](#stochastic-gradient-descent)
+- [Computer Vision](#computer-vision)
+  * [Convolution and ReLU](#convolution-and-relu)
+  * [Maximum Pooling](#maximum-pooling)
+- [Time Series](#time-series)
+  * [Trend](#trend)
+  * [Seasonality](#seasonality)
+  * [Cycle](#cycle)
+  * [Hybrid Models](#hybrid-models)
+  * [Forecasting With Machine Learning](#forecasting-with-machine-learning)
+    + [Multistep Forecasting Strategies](#multistep-forecasting-strategies)
+- [Data Cleaning](#data-cleaning)
+  * [Handling Missing Values](#handling-missing-values)
+  * [Scaling and Normalization](#scaling-and-normalization)
+  * [Parsing Dates](#parsing-dates)
+  * [Character Encodings](#character-encodings)
+  * [Inconsistent Data Entry](#inconsistent-data-entry)
+- [AI Ethics](#ai-ethics)
+  * [Human-Centered Design for AI](#human-centered-design-for-ai)
+  * [Identifying Bias in AI](#identifying-bias-in-ai)
+  * [AI Fairness](#ai-fairness)
+  * [Model Cards](#model-cards)
+- [Geospatial Analysis](#geospatial-analysis)
+  * [Reading and ploting data](#reading-and-ploting-data)
+  * [Coordinate Reference System](#coordinate-reference-system)
+  * [Interactive Maps](#interactive-maps)
+  * [Manipulating Geospatial Data](#manipulating-geospatial-data)
+  * [Proximity Analysis](#proximity-analysis)
+- [Machine Learning Explinability](#machine-learning-explinability)
+  * [Use Cases for Model Insights](#use-cases-for-model-insights)
+  * [Permutation Importance](#permutation-importance)
+  * [Partial Plots](#partial-plots)
+  * [SHAP Values](#shap-values)
+  * [Advanced Uses of SHAP Values](#advanced-uses-of-shap-values)
+- [Natural Language Processing](#natural-language-processing)
+  * [Intro to NLP](#intro-to-nlp)
+  * [Text Classification](#text-classification)
+  * [Word Vectors](#word-vectors)
+- [Intro to Game AI and Reinforcement Learning](#intro-to-game-ai-and-reinforcement-learning)
+  * [One-Step Lookahead](#one-step-lookahead)
+  * [N-Step Lookahead](#n-step-lookahead)
+  * [Deep Reinforcement Learning](#deep-reinforcement-learning)
+
+
+
 # Data Leakage
 
 https://www.kaggle.com/alexisbcook/data-leakage
@@ -2548,4 +2623,79 @@ sims = np.array([cosine_similarity(review_vec - vec_mean, vec) for vec in center
 # Get the index for the most similar document
 most_similar = sims.argmax()
 ```
+
+
+
+
+
+# Intro to Game AI and Reinforcement Learning
+
+## One-Step Lookahead
+
+![img](https://i.imgur.com/EZKHxyy.png)
+
+Connect Four 게임에는 4조 개 그 이상의 경우의 수가 존재하며 강화학습을 위하여 휴리스틱하게 아래와 같이 점수를 부여한다. (이길 가능성이 높은 상황에 점수를 더 많이 주고 질 가능성이 높은 상황에 점수를 빼앗는다.)
+
+![img](https://i.imgur.com/vzQa4ML.png)
+
+점수가 가장 높게 나온 1번 상황을 다음 행동으로 채택한다. 같은 점수인 상황이 있다면 랜덤하게 뽑는다.
+
+![img](https://i.imgur.com/PtnLOHt.png)
+
+2개가 연결된 상황에도 점수를 부여하면 위의 방식으로 놓을 때와 견주어 약 70%의 승률을 보인다.
+
+
+
+## N-Step Lookahead
+
+**Minimax** 알고리즘을 이용
+
+1. 내가 놓음
+2. 상대가 놓음
+3. 다시 내가 놓음
+
+이런 상황에서 나올 수 있는 모든 경우에서 점수를 계산한 뒤
+
+1. 내가 마지막에 놓았을 때 점수가 최대가 되는 경우를 뽑음
+2. 상대가 놓았을 때 상대 입장에서 점수가 최대가 되는, 나에게 있어서 점수가 최소가 되는 경우를 뽑음
+3. 다시 점수가 최대가 되는 경우를 뽑음
+
+![img](https://i.imgur.com/bWezUC3.png)
+
+
+
+## Deep Reinforcement Learning
+
+앞서 휴리스틱한 방법으로 점수를 주어 경우를 선택했다면, 강화학습을 통해 상황별로 승률이 더 높은 경우를 선택하도록 학습하도록 한다.
+
+**접근 방법**
+
+- 매 이동마다
+
+  - 이동을 통해 이겼다면 `+1`
+
+  - 잘못된 동작을 한다면 `-10`
+
+  - 상대가 이기는 것을 막지 못해서 졌다면 `-1`
+
+  - 그 외에는 `1/42`
+
+- 최종적으로 받은 보상을 모두 합친다.
+
+  - 예를 들어 총 8번(각 선수마다 4번) 이동하여 승리했다면 `3*(1/42) + 1`
+  - 총 11번(상대 6번) 이동하여 패배했다면 `5*(1/42) -1`
+  - 무승부를 기록했다면 `21*(1/42)`
+  - 총 7번(상대 3번) 이동하고 잘못된 동작을 하여 졌다면 `3*(1/42) - 10`
+
+목표는 이 최종 점수를 최대화하는 신경망의 가중치를 찾는 것이다.
+
+
+
+**강화 학습** 알고리즘에는 DQN, A2C, PPO 등 다양한 것들이 있으며 비슷한 절차를 밟아 AI를 만든다.
+
+- 첫 가중치는 랜덤으로 배정한다.
+- 새로운 가중치를 넣어가며 게임을 계속 플레이하고, 점수를 더 많이 얻는 방향으로 가중치를 계속 수정해간다.
+- `1/42`점을 주는 이유는 알고리즘이 더 쉽게 수렴하도록 하기 위함이며 'temporal credit assignment problem'과 'reward shaping'을 더 공부하면 알 수 있다고 한다.
+
+
 
