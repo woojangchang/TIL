@@ -4,3 +4,5 @@
 - PDP (Partial Dependence Plot)
 - shapley value
 - Ethick AI
+- LIME
+- Calibrated Explanations
